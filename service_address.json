@@ -1,0 +1,567 @@
+{
+  "serviceMap": {
+    "com.integrated-package": {
+      "service": "com.integrated-package",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "channel": "[id: 0xc22b6205, /192.168.1.96:53064 => /192.168.1.96:40811]",
+          "host": "192.168.1.96",
+          "port": 40000,
+          "isOK": true
+        }
+      }
+    },
+    "com.clickstream": {
+      "service": "com.clickstream",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "channel": "[id: 0xc22b6205, /192.168.1.96:53064 => /192.168.1.96:40811]",
+          "host": "192.168.1.96",
+          "port": 40811,
+          "isOK": true
+        }
+      }
+    },
+    "com.crm": {
+      "service": "com.crm",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "channel": "[id: 0xc31dd3ca, /192.168.1.96:59522 => /192.168.1.97:40996]",
+          "host": "192.168.1.96",
+          "port": 40000,
+          "isOK": true
+        }
+      }
+    },
+    "com.crm-supervisor": {
+      "service": "com.crm-supervisor",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.crm-quality": {
+      "service": "com.crm-quality",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.pmat": {
+      "service": "com.pmat",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "channel": "[id: 0x1bfd6db0, /192.168.1.96:49892 => /192.168.1.96:40421]",
+          "host": "192.168.1.96",
+          "port": 40000,
+          "isOK": true
+        }
+      }
+    },
+    "com.helloworld": {
+      "service": "com.helloworld",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "channel": "[id: 0x1bfd6db0, /192.168.1.96:49892 => /192.168.1.96:40421]",
+          "host": "192.168.1.96",
+          "port": 40000,
+          "isOK": true
+        }
+      }
+    },
+    "com.payment": {
+      "service": "com.payment",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "channel": "[id: 0xf50fba71, /192.168.1.96:40792 => /192.168.1.97:40896]",
+          "host": "192.168.1.96",
+          "port": 40000,
+          "isOK": true
+        }
+      }
+    },
+    "com.image": {
+      "service": "com.image",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.permission": {
+      "service": "com.permission",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "channel": "[id: 0xbe5cfa76, /192.168.1.96:51448 => /192.168.1.96:40119]",
+          "host": "192.168.1.96",
+          "port": 40000,
+          "isOK": true
+        }
+      }
+    },
+    "com.search": {
+      "service": "com.search",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "channel": "[id: 0x10a89e73, /192.168.1.96:33466 => /192.168.1.97:40669]",
+          "host": "192.168.1.96",
+          "port": 40000,
+          "isOK": true
+        }
+      }
+    },
+    "com.shejiben": {
+      "service": "com.shejiben",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "channel": "[id: 0xa764cf0f, /192.168.1.96:39071 => /192.168.3.168:40138]",
+          "host": "192.168.1.96",
+          "port": 40000,
+          "isOK": true
+        }
+      }
+    },
+    "com.tumall": {
+      "service": "com.tumall",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "channel": "[id: 0x885138a1, /192.168.1.96:43959 => /192.168.1.96:40998]",
+          "host": "192.168.1.96",
+          "port": 40000,
+          "isOK": true
+        }
+      }
+    },
+    "com.weixin": {
+      "service": "com.weixin",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "channel": "[id: 0x536eb220, /192.168.1.96:56107 => /192.168.1.97:40132]",
+          "host": "192.168.1.96",
+          "port": 40000,
+          "isOK": true
+        }
+      }
+    },
+    "com.yz": {
+      "service": "com.yz",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "channel": "[id: 0x67b4640c, /192.168.1.96:43035 => /192.168.1.96:40247]",
+          "host": "192.168.1.96",
+          "port": 40000,
+          "isOK": true
+        }
+      }
+    },
+    "crm.huodong": {
+      "service": "crm.huodong",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "channel": "[id: 0xfa3c9082, /192.168.1.96:56596 => /192.168.1.96:40378]",
+          "host": "192.168.1.96",
+          "port": 40000,
+          "isOK": true
+        }
+      }
+    },
+    "esb.old": {
+      "service": "esb.old",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 38888
+        }
+      }
+    },
+    "com.filter": {
+      "service": "com.filter",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.diary": {
+      "service": "com.diary",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.decoitem": {
+      "service": "com.decoitem",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.ask": {
+      "service": "com.ask",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "crm.msg": {
+      "service": "crm.msg",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.usercenter": {
+      "service": "com.usercenter",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.dw-item": {
+      "service": "com.dw-item",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.dw-supervisor": {
+      "service": "com.dw-supervisor",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.dw-amat": {
+      "service": "com.dw-amat",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.dw-foreman": {
+      "service": "com.dw-foreman",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.dw-foreman-m": {
+      "service": "com.dw-foreman-m",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.dw-advisor": {
+      "service": "com.dw-advisor",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.finance": {
+      "service": "com.finance",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.dc-item": {
+      "service": "com.dc-item",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.financial-account": {
+      "service": "com.financial-account",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.financial-remit": {
+      "service": "com.financial-remit",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.data-pack": {
+      "service": "com.data-pack",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.alarm": {
+      "service": "com.alarm",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+     "com.supply": {
+       "service": "com.supply",
+       "policy": "RandomPolicy",
+       "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+           "port": 40000
+         }
+      }
+     },
+    "com.oa": {
+      "service": "com.oa",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.estate": {
+      "service": "com.estate",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.codec": {
+      "service": "com.codec",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.debug": {
+      "service": "com.debug",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.oper-config": {
+      "service": "com.oper-config",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "com.commemt": {
+      "service": "com.comment",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      }
+    },
+    "caller.data": {
+      "service": "caller.data",
+      "policy": "RandomPolicy",
+      "onlineInstances": {
+        "1": {
+          "host": "192.168.1.96",
+          "port": 40000
+        }
+      },
+      "com.decocom": {
+        "service": "com.decocom",
+        "policy": "RandomPolicy",
+        "onlineInstances": {
+          "1": {
+            "host": "192.168.1.96",
+            "port": 40000
+          }
+        }
+      },
+      "com.indent": {
+        "service": "com.indent",
+        "policy": "RandomPolicy",
+        "onlineInstances": {
+          "1": {
+            "host": "192.168.1.96",
+            "port": 40000
+          }
+        }
+      },
+      "com.settlement": {
+        "service": "com.settlement",
+        "policy": "RandomPolicy",
+        "onlineInstances": {
+          "1": {
+            "host": "192.168.1.96",
+            "port": 40000
+          }
+        }
+      },
+      "com.complaints": {
+        "service": "com.complaints",
+        "policy": "RandomPolicy",
+        "onlineInstances": {
+          "1": {
+            "host": "192.168.1.96",
+            "port": 40000
+          }
+        }
+      },
+      "com.alpha-data": {
+        "service": "com.alpha-data",
+        "policy": "RandomPolicy",
+        "onlineInstances": {
+          "1": {
+            "host": "192.168.1.96",
+            "port": 40000
+          }
+        }
+      },
+      "com.storage": {
+        "service": "com.storage",
+        "policy": "RandomPolicy",
+        "onlineInstances": {
+          "1": {
+            "host": "192.168.1.96",
+            "port": 40000
+          }
+        }
+      },
+      "com.financial-pay": {
+        "service": "com.financial-pay",
+        "policy": "RandomPolicy",
+        "onlineInstances": {
+          "1": {
+            "host": "192.168.1.96",
+            "port": 40000
+          }
+        }
+      },
+      "com-bpmn": {
+        "service": "com-bpmn",
+        "policy": "RandomPolicy",
+        "onlineInstances": {
+          "1": {
+            "host": "192.168.1.96",
+            "port": 40000
+          }
+        }
+      },
+      "com.call-inbound": {
+        "service": "com.call-inbound",
+        "policy": "RandomPolicy",
+        "onlineInstances": {
+          "1": {
+            "host": "192.168.1.96",
+            "port": 40000
+          }
+        }
+      }
+    }
+  },
+    "aliasMap": {
+      "crm.sms": "com.crm",
+      "crm.svdb": "com.crm",
+      "crm.bid": "com.crm",
+      "crm.query": "com.crm",
+      "crm.utils": "com.crm",
+      "crm.huodong": "crm.huodong",
+      "crm.biddb": "com.crm",
+      "crm.tools": "com.crm",
+      "crm.item": "com.crm",
+      "crm.sv": "com.crm",
+      "crm.itemdb": "com.crm",
+      "crm.mainpage": "com.crm",
+      "crm.configNode": "com.crm"
+    },
+    "broken": []
+  
+}

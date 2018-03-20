@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+
+# JAVAXMS=512m
+# JAVAXMX=1024m
+
+
+APPROG="${BASH_SOURCE-$0}"
+#approg=(${APPROG//\// })
+#PROG="${approg[${#approg[@]}-1]}"
+#PROG="${approg[@]:$[${#approg[@]}-1]:1}"
+PROG="$(basename ${APPROG})"
+# PROG=app-server-1
+# echo $PROG
+
+
+prog=(${PROG//-server-/ })
+INSTANCE="${prog[1]}"
+# INSTANCE=1
+# echo $INSTANCE
+
+#APP="$(basename ${APPROG})"
+APPBIN="$(dirname ${APPROG})"
+APPDIR="$(cd "${APPBIN}/../"; pwd)"
+APP="$(basename ${APPDIR})"
+# APP=app
+# APPDIR=/java/apps/app
+# echo $APP
+# echo $APPDIR
+
+APPBIN="${APPDIR}/bin"
+# APPBIN=/java/apps/app/bin
+APPFGDIR="${APPDIR}/conf/${ENV}"
+# APPFGDIR=/java/apps/app/conf/dev
+APPCLASSPATH="${APPDIR}/libs"
+# APPCLASSPATH=/java/apps/app/libs
+# echo $APPBIN
+# echo $APPFGDIR
+# echo $APPCLASSPATH
+
+
+appdir=(${APPDIR//\// })
+javadir="${appdir[@]::$[${#appdir[@]}-2]}"
+JAVADIR="/${javadir//\ //}"
+JAVASBIN="${JAVADIR}/sbin"
+JAVAPROG="${JAVASBIN}/java-server"
+# JAVADIR=/java
+# JAVASBIN=/java/.sbin
+# JAVAPROG=/java/.sbin/.java-server
+# echo $JAVADIR
+# echo $JAVASBIN
+# echo $JAVAPROG
+
+VERSION=`awk -F'=' '$1 == "version" {printf("%s",  $2)}'  $APPFGDIR/version`
+
+
+
+#cp -f "${APPFGDIR}/mainclass.conf" "${APPFGDIR}/.mainclass.conf"
+#sed -e '/\r/s/.$//' "${APPFGDIR}/mainclass.conf" > "${APPFGDIR}/.mainclass.conf"
+#MAIN="${INSTANCE/#/MAINCLASS-}"
+MAIN="${PROG/#/MAINCLASS-}"
+while read line
+do
+    if [ "$line" != "" ]
+    then
+        line="${line//=/ }"
+        main=(${line})
+
+        if [[ "${main[0]}" == "$MAIN" ]]
+        then
+            MAINCLASS=${main[1]}
+            break
+        fi
+    fi
+
+done < "${APPFGDIR}/mainclass.conf"
+# echo $MAINCLASS
+
+
+case "$1" in
+start|stop|sstop|restart|debug)
+    . "${JAVAPROG}" ${@}
+
+    ;;
+
+*)
+    echo "Usage: $0 {start|stop|sstop|restart|debug}" >&2
+    ;;
+
+esac

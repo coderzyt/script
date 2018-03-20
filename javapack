@@ -1,0 +1,435 @@
+#!/bin/bash
+#####################################
+# Author: janson.jiang
+# Date: 2017-02-23
+# Descriptions: new maven pack script
+# Version: 2.0
+#####################################
+
+# IT4.0 Java项目多模块打包脚本
+# 打包流程：更新源码->计算版本号->构建->逐个模块
+#                                 打包->发布到publish仓库(git)
+#                                                               ->结束
+
+# 默认配置
+RED='\033[0;31m'
+NC='\033[0m'
+# gitlab api url prefix
+GITLAB_API_URL=http://repo.we.com/api/v3
+# gitlab api权限token
+GITLAB_API_TOKEN=s58jZSxSo6pN4fz6Theu
+# 源码仓库所在Gitlab命名空间
+SOURCE_NS='wingyiu.li'
+# 发布仓库所在Gitlab命名空间
+RELEASE_NS='wingyiu.li'
+# 这个写死,publish这个命名空间的id 未用到
+RELEASE_NS_ID=407
+# 源码仓库操作基目录
+SOURCE_DIR=/tmp/boss/build/source
+# 发布仓库操作基目录
+RELEASE_DIR=/tmp/boss/build/publish
+# 日志目录
+LOG_DIR=/tmp/boss/build/log
+# 打包时间
+timestamp=`date +%s`
+# 此次打包的日志
+LOG_FILE=$LOG_DIR/package_$timestamp.log
+# 是否打印maven输出
+PRINT_MVN_LOG=0
+# 配置文件
+CONFNAME=pack.conf
+# 启动脚本
+CTLSCRIPT_NAME=control.sh
+# 脚本路径
+SCRIPT_DIR=`readlink -f $(dirname $0)`
+
+CFG_FILE=${SCRIPT_DIR}/${CONFNAME}
+STARTSCRIPT=${SCRIPT_DIR}/${CTLSCRIPT_NAME}
+
+# 加载自定义配置
+if [[ -f ${CFG_FILE} ]];then
+    source ${CFG_FILE}
+fi
+
+# 示例example variables
+EX_PROJ=t8t-ps-hello
+EX_MOD1=server
+EX_MOD2=server,task
+EX_BR=dev
+EX_CI=f2d912d
+
+# 帮助提示
+Usage() {
+    echo "Usage:"
+    echo "  $0 [-p project] [-m module1,module2,...] [-b branch] [-c commit] [-d true/false]"
+    echo "  -p Specify the project name"
+    echo "  -m Specify the modules of the project"
+    echo "  -b Specify the branch of the project"
+    echo "  -c Specify the commit of the branch of the project"
+    echo "  -d publish api.jar to PW. option: true/false,default is false"
+    echo "Example:"
+    echo "  $0 -p ${EX_PROJ} -m ${EX_MOD1} -b ${EX_BR}"
+    echo "  $0 -p ${EX_PROJ} -m ${EX_MOD1} -b ${EX_BR} -d true"
+    echo "  $0 -p ${EX_PROJ} -m ${EX_MOD2} -b ${EX_BR} -c ${EX_CI}"
+}
+
+#log
+TBT_LOG() {
+    echo "`date +"%F %T"` $*" >> ${LOG_FILE}
+}
+
+# 更新源码
+TBT_UPDATE_SRC_CODE() {
+    # TBT_LOG [INFO] "更新源码"
+    echo "更新源码，开始"
+    if [[ ! -d ${SOURCE_DIR}/${PROJECT} ]]; then
+        echo "源码仓库目录${SOURCE_DIR}/${PROJECT}不存在，进行clone..."
+        mkdir -p ${SOURCE_DIR}
+        cd ${SOURCE_DIR}
+        git clone ${SOURCE_REPO} -b ${SRC_BRANCH} || exit 1
+        #cd -
+    else
+        echo "源码仓库目录${SOURCE_DIR}/${PROJECT}存在，进行更新"
+        cd ${SOURCE_DIR}/${PROJECT}
+	git fetch origin ${SRC_BRANCH}
+        git checkout ${SRC_BRANCH}
+        git pull origin ${SRC_BRANCH} || exit 1
+        #cd -
+    fi
+    echo "更新源码，结束"
+}
+
+# 更新模块publish的仓库
+# 目录结构示意：
+#${RELEASE_DIR}
+#├── publish
+#│   ├── t8t-ps-asdfsf
+#│   │   ├── server    对应publish/t8t-ps-asdfsf.git的server分支
+#│   │   │   ├── .git
+#│   │   │   ├── lib
+#│   │   │   ├── t8t-ps-asdfsf-server-1.0.jar
+#│   │   │   └── version
+#│   │   └── task
+#│   │       ├── .git
+#│   │       ├── lib
+#│   │       ├── t8t-ps-asdfsf-task-1.0.jar
+#│   │       └── version
+TBT_UPDATE_RELEASE() {
+    # TBT_LOG [INFO] "更新项目publish仓库代码"
+    local module=$1
+    echo "更新模块${module}的publish仓库，开始"
+
+    if [[ ! -d ${RELEASE_DIR}/${PROJECT} ]];then
+        echo "${RELEASE_DIR}/${PROJECT}目录不存在，创建"
+        mkdir -p ${RELEASE_DIR}/${PROJECT}
+    fi
+
+    if [[ -d ${RELEASE_DIR}/${PROJECT}/${module} ]]; then
+        echo "模块$1的发布目录存在，更新"
+        cd ${RELEASE_DIR}/${PROJECT}/${module}
+        git checkout ${module}
+        git pull origin ${module} || exit 1
+        #cd -
+    else
+        echo "模块$1的发布目录不存在，创建"
+        TBT_INIT_RELEASE ${module}
+    fi
+
+    echo "更新模块${module}的publish仓库，结束"
+}
+
+# 初始化某个模块的publish仓库目录和分支
+TBT_INIT_RELEASE() {
+    local module=$1
+
+    #echo "create publish/${PROJECT} in case it is not already exists"
+    #curl -H 'PRIVATE-TOKEN: ${GITLAB_API_TOKEN}' ${GITLAB_API_URL}/projects -d name=${PROJECT}'&namespace_id=${RELEASE_NS_ID}'
+
+    cd ${RELEASE_DIR}/${PROJECT}
+    git clone ${RELEASE_REPO} ${module} || exit 1
+    if [[ $? -ne 0 ]];then
+        echo -e "${RED}${PROJECT}的publish仓库不存在,请联系janson.jiang处理!!!${NC}"
+        exit 1
+    fi
+    if [[ -z $(ls ${module}) ]];then
+        cd ${module}
+        touch README.md
+        git add README.md
+        git commit -m "first commit"
+        git push -u origin master || exit 1
+        git checkout -b ${module}
+    else
+        cd ${module} && git checkout -b ${module}
+        #git pull origin ${module}
+    fi
+}
+
+# 计算新版本号
+# 遍历所有模块，取最大的version，然后+1，作为所有新打包模块的version
+TBT_GET_VERSION() {
+    # TBT_LOG [INFO] "获取publish仓库中项目的版本号"
+    echo "获取publish仓库中项目的版本号"
+    for idx in ${!MODULE[@]}
+    do
+        if [[ -f ${RELEASE_DIR}/${PROJECT}/${MODULE[${idx}]}/version ]]; then
+            OLD_VERSION=`grep -i version ${RELEASE_DIR}/${PROJECT}/${MODULE[${idx}]}/version | awk -F'=' '{print $2}'`
+        else
+            OLD_VERSION=0
+        fi
+        TMP_VERSION=${TMP_VERSION}${OLD_VERSION}' '
+    done
+    TMP_VERSION=(${TMP_VERSION})
+    MAX=${TMP_VERSION[0]}
+    for vr in ${!TMP_VERSION[@]}
+    do
+        if [[ ${MAX} -le ${TMP_VERSION[${vr}]} ]];then
+            MAX=${TMP_VERSION[${vr}]}
+        fi
+    done
+    OLD_VERSION=${MAX}
+    if echo ${OLD_VERSION} | grep '^[0-9][0-9]*$' -q > /dev/null; then
+        let VERSION=OLD_VERSION+1
+    fi
+}
+
+#start package
+TBT_START_PACK() {
+    local module=$1
+    echo "打包模块:${module},开始"
+    TBT_PACKAGE ${module}
+    if [[ $? -ne 0 ]];then
+        echo -e "${RED}项目: ${PROJECT} 模块: ${module} 打包失败，终止,请联系janson.jiang处理!!!${NC}"
+        cd ${RELEASE_DIR} && rm -rf ${PROJECT}.${timestamp}
+        cd ${SOURCE_DIR} && rm -rf ${PROJECT}.${timestamp}
+        exit 1
+    fi
+    echo "发布模块${module}到远端publish仓库，开始"
+    cd ${RELEASE_DIR}/${PROJECT}.${timestamp}/${module}
+    git push --tags origin ${module} || exit 1 
+    if [[ $? -eq 0 ]];then
+        flag=true
+    else
+        flag=false
+        echo "${RED}发布打包后的模块${module}代码到publish仓库失败,请联系janson.jiang进行处理!!!${NC}"
+        cd ${RELEASE_DIR} && rm -rf ${PROJECT}.${timestamp}
+        cd ${SOURCE_DIR} && rm -rf ${PROJECT}.${timestamp}
+        exit 1
+    fi
+    #cd -
+    echo "发布模块${module}到远端publish仓库，结束"
+    echo "构建、打包、发布模块:${module}, 结束"
+}
+
+# 构建和打包模块
+# 从${SOURCE_DIR}/${PROJECT}目录 复制源码到 ${SOURCE_DIR}/${PROJECT}.${timestamp}目录
+# 在${SOURCE_DIR}/${PROJECT}.${timestamp}目录里构建
+# 然后从${SOURCE_DIR}/${PROJECT}.${timestamp}/${module}里复制
+# 构建产物到${RELEASE_DIR}/${PROJECT}.${timestamp}/${module}/，commit
+TBT_BUILD()
+{
+    local proj_mod=$1
+    echo -e "\n<<<<<<maven构建 ...... 开始!>>>>>>\n"
+    
+    cd ${SOURCE_DIR}/${PROJECT}
+    git checkout ${SRC_BRANCH}
+    if [[ -n ${COMMIT} ]];then
+        echo "检出代码到特定commit: ${COMMIT}"
+        git reset --hard ${COMMIT}
+    else
+        echo "检出代码到最新commit(HEAD)"
+        git reset --hard
+    fi
+    git clean -f -d
+    #找到源码${COMMIT}的提交信息作为publish仓库的commit描述
+    lastlog=`git log ${COMMIT} --pretty=format:"%s" -1`
+    #cd -
+
+    cp -r ${SOURCE_DIR}/${PROJECT} ${SOURCE_DIR}/${PROJECT}.${timestamp}
+    cp -r ${RELEASE_DIR}/${PROJECT} ${RELEASE_DIR}/${PROJECT}.${timestamp}
+
+    cd ${SOURCE_DIR}/${PROJECT}.${timestamp}
+    echo "清除旧的构建文件，并重新构建"
+
+    mvn clean package -DskipTests -U -pl ${proj_mod} -am
+
+    if [[ $? -ne 0 ]];then
+        echo -e "${RED}project: ${PROJECT} branch: ${SRC_BRANCH} mvn打包构建失败,请联系janson.jiang进行处理!!!${NC}"
+        rm -rf ${SOURCE_DIR}/${PROJECT}.${timestamp}
+        rm -rf ${RELEASE_DIR}/${PROJECT}.${timestamp}
+        exit 1
+    fi
+}
+
+TBT_PACKAGE()
+{
+    local module=$1
+
+    cd ${RELEASE_DIR}/${PROJECT}.${timestamp}/${module} && rm * -rf
+    #cd -
+    echo -e "\n<<<<<<提取maven构建文件 ...... 开始!>>>>>>\n"
+
+    MOD_ABS_DIR=${PROJECT}.${timestamp}/${PROJECT}-${module}
+    # 依赖
+    /bin/cp -rf ${SOURCE_DIR}/${MOD_ABS_DIR}/target/lib ${RELEASE_DIR}/${PROJECT}.${timestamp}/${module}/
+    # 模块jar
+    /bin/cp -f ${SOURCE_DIR}/${MOD_ABS_DIR}/target/${PROJECT}*.jar ${RELEASE_DIR}/${PROJECT}.${timestamp}/${module}/
+    #启动脚本
+    /bin/cp -f ${STARTSCRIPT} ${RELEASE_DIR}/${PROJECT}.${timestamp}/${module}/
+    # version文件
+    cat << END > ${RELEASE_DIR}/${PROJECT}.${timestamp}/${module}/version
+version=${VERSION}
+commit-id=${COMMIT}
+build-time=`date`
+END
+
+    echo -e "\n<<<<<<提交发布版本到发布仓库 ...... 开始!>>>>>>\n"
+   
+    cd ${RELEASE_DIR}/${PROJECT}.${timestamp}/${module}
+    tmp=`ls -R .`
+    files=`echo ${tmp}|sed 's/\.: //'|sed 's/.\/lib/lib\//'`
+    git add -A
+    gitstatus=`git status`
+    result=$(echo $gitstatus | grep "nothing to commit")
+    if [[ "${result}" != "" ]];then
+        echo -e "${RED}模块发布仓库没有变更，直接退出!!!${NC}"
+        rm -rf ${SOURCE_DIR}/${PROJECT}.${timestamp}
+        rm -rf ${RELEASE_DIR}/${PROJECT}.${timestamp}
+        exit 1
+    fi
+    git commit -m "${lastlog}"
+    #commit=`echo ${COMMIT} | grep -o '^.\{8\}'`
+    #git tag tag-${commit}-${module}
+    git tag tag-${timestamp}-${module}
+    #cd -
+}
+
+# main
+have_p=false
+have_m=false
+have_b=false
+while getopts :hp:m:c:b:d: OPTION
+do
+    case ${OPTION} in
+        p)
+        PROJECT=${OPTARG}
+        have_p=true
+        ;;
+        m)
+        MODULE=(`echo ${OPTARG} | tr ',' ' '`)
+        have_m=true
+        ;;
+        c)
+        COMMIT=${OPTARG}
+        ;;
+        b)
+        SRC_BRANCH=${OPTARG}
+        have_b=true
+        ;;
+        d)
+        deploy=${OPTARG}
+        ;;
+        h)
+        Usage
+        exit 0
+        ;;
+        ?)
+        echo "error: Illegal Option."
+        Usage
+        exit 0
+        ;;
+    esac
+done
+
+if [[ "${have_p}"x != "true"x || "${have_m}"x != "true"x || "${have_b}"x != "true"x ]];then
+    echo -e "${RED}[ERROR] You must enter [project] [module] [branch] for package,必须输入项目、模块和分支进行打包!!!${NC}"
+    Usage
+    exit 1
+fi
+
+if [[ -z ${deploy} ]];then
+    deploy="false"
+else
+    if [[ "${deploy}" != "true" && "${deploy}" != "false" ]];then
+        echo -e "${RED}[ERROR] The [-d] just true/false for package,请联系janson.jiang进行处理!!!${NC}"
+        Usage
+        exit 1
+    fi
+fi
+
+echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@更新源码@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+echo "项目:${PROJECT}"
+echo "分支:${SRC_BRANCH}"
+echo "模块:${MODULE[@]}"
+if [[ -z ${COMMIT} ]];then
+    echo "Commit:未指定，取最新"
+else
+    echo "Commit:${COMMIT}"
+fi
+echo "-----------------------------------"
+
+SOURCE_REPO=git@repo.we.com:${SOURCE_NS}/${PROJECT}.git
+RELEASE_REPO=git@repo.we.com:${RELEASE_NS}/${PROJECT}.git
+
+echo "源码仓库: ${SOURCE_REPO}"
+echo "发布仓库: ${RELEASE_REPO}"
+echo "源码目录: ${SOURCE_DIR}/${PROJECT}"
+echo "发布目录: ${RELEASE_DIR}/${PROJECT}"
+echo "开始时间: ${timestamp}"
+echo "-----------------------------------"
+
+TBT_UPDATE_SRC_CODE
+
+echo "-----------------------------------"
+
+if [[ -z ${COMMIT} ]];then
+    cd ${SOURCE_DIR}/${PROJECT}
+    COMMIT=`git rev-parse $(git log origin/${SRC_BRANCH} --first-parent -1 --pretty="%h")`
+    #cd -
+    echo "未指定Commit,计算得最新Commit: ${COMMIT}"
+    #echo "-----------------------------------"
+fi
+
+echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@更新publish仓库代码@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+# 更新所有模块的publish git仓库
+for MOD in ${MODULE[@]}
+do
+    echo "-----------------------------------"
+    TBT_UPDATE_RELEASE ${MOD}
+done
+
+echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@计算版本号@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+# 计算version
+TBT_GET_VERSION
+echo "新版本号:${VERSION}"
+
+echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@开始mvn构建@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+# 开始mvn构建
+for MOD in ${MODULE[@]}
+do
+    Pro_Mod_tmp=${Pro_Mod_tmp}${PROJECT}-${MOD},
+done
+Pro_Mod=`echo ${Pro_Mod_tmp/%,/}`
+TBT_BUILD ${Pro_Mod}
+
+echo "@@@@@@@@@@@@@@@@@@@@@@@@@@开始打包,推远程publish仓库@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+# 逐个模块打包，并发布到publish仓库
+content="\n"
+for MOD in ${MODULE[@]}
+do
+    #echo "-----------------------------------"
+    TBT_START_PACK ${MOD}
+    echo "-----------------------------------"
+    TBT_UPDATE_RELEASE ${MOD}
+    if [[ ${flag} == "true" ]];then
+        content="${content}项目:${PROJECT}\t模块:${MOD}\t打包成功\t打包后文件列表:\n${files}\n\n"
+    else
+        content="${content}项目:${PROJECT}\t模块:${MOD}\t打包失败"
+    fi
+done
+echo -e ${content}
+
+# 删除临时目录
+cd ${RELEASE_DIR} && rm -rf ${PROJECT}.${timestamp}
+cd ${SOURCE_DIR} && rm -rf ${PROJECT}.${timestamp}
+echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@打包构建结束@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+

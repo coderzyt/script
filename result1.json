@@ -1,0 +1,124 @@
+{
+  "_index": "search_v171123",
+  "_type": "deco_company",
+  "_id": "2454354",
+  "_version": 94,
+  "found": true,
+  "_source": {
+    "id": 2454354,
+    "cname": "东莞市施诺装饰工程有限公司",
+    "goodlevel": 1,
+    "youhui": 0,
+    "jointime": 1520335311,
+    "omod": 0,
+    "fz_city": 1181,
+    "areaid": 3181,
+    "koubei": 0,
+    "pattern": 0,
+    "kbpf": 9.5,
+    "isrq": 0,
+    "laidian_price": 0.0,
+    "sort_price": 0.0,
+    "yuyue_nums": 0,
+    "near_yw_nums": 0,
+    "downline": 0,
+    "update_time": 1521081133,
+    "cxbzj": 15000.0,
+    "grade": 7,
+    "city": "",
+    "town": "",
+    "adds": "",
+    "total_laidian": 0,
+    "viewnums": 2760,
+    "xinyon": 694.0,
+    "qg_kbpf": 24.5,
+    "hadcooperate": 1,
+    "hz_fg": "现代,中式,欧式",
+    "fg": "2,3,4",
+    "hz_fwqy":
+      "莞城,东城,石龙镇,企石镇,横沥镇,桥头镇,东坑镇,常平镇,寮步镇,大朗镇,黄江镇,塘厦镇,樟木头镇",
+    "fwqy": "3168,3171,3173,3176,3177,3178,3180,3181,3182,3183,3184,3186,3197",
+    "hz_jzywfw": "普通住宅",
+    "jzywfw": "4",
+    "hz_gzywfw": "",
+    "gzywfw": "",
+    "cjjwxx": 0,
+    "cjjwsx": 0,
+    "hz_cjjw": "3-5万,5-8万,8-12万,12-18万,18-30万,30-100万,100万以上",
+    "cjjw": "2,3,4,5,6,7,8",
+    "gdnum": 88,
+    "casenum": 23,
+    "comment_good_rate": 90.91,
+    "design_avg": 9.5,
+    "construct_avg": 9.2,
+    "service_avg": 9.4,
+    "zb_num": 23,
+    "xinyon_net_added": 225,
+    "xaxis": 116.392363,
+    "yaxis": 39.734325,
+    "hq": 1,
+    "ispass": 1,
+    "zzzs": 1,
+    "credit_level": 3,
+    "weight": 0,
+    "location": { "lon": 116.392363, "lat": 39.734325 }
+  }
+}
+
+{
+  "service": "com.search",
+  "interface": "company.search2",
+  "args": {
+    "start": 0,
+    "size": 20,
+    "return_fields": ["id", "fz_city", "distance", "viewnums", "cxbzj", "activebzj", "total_laidian", "cname", "xaxis", "yaxis", "xinyon", "koubei", "kbpf", "goodlevel", "comment_good_rate", "xinyon_net_added", "credit_level", "casenum", "design_avg", "construct_avg", "service_avg"],
+    "fz_city": 1181,
+    "hq": 1,
+    "filter_complaint": 1,
+    "longitude": 113.939997,
+    "latitude": 22.546905,
+    "sort": ["hadcooperate:desc"]
+  }
+}
+
+curl - X POST http://192.168.1.36:9200/search_idc/deco_company/2454354/_update 
+-d '{"doc": {"xaxis": 114.004445,"yaxis": 22.973982,"location": {"lon": 114.004445,"lat": 22.973982}}}'
+
+
+前后台开发知识： 操作系统、 网络、 开发语言、 程序开发、 第三方软件 / 系统
+
+
+"*熟悉Linux下网络编程，熟悉tcp/ip、http协议； *
+熟练掌握Java语言；
+  *
+  熟悉进程及线程开发模式； *
+  熟练掌握常用数据结构和算法； *
+  能在架构设计好的情况下独立完成高性能服务器或服务器核心模块的开发 "
+
+  列举相关实践项目、 总结和思考
+
+
+
+运营运维（ 比如机型类型等）
+
+* 
+熟悉linux服务器操作系统管理、 优化、 命令行操作， 了解数据上报和服务监控并能利用OSS系统对服务进行监控和报警， 
+了解系统所用机型的特点和主要参数
+
+列举相关实践项目、 总结和思考
+
+
+
+软件架构能力
+
+"*熟悉掌握优秀的软件架构思想、方法和技巧 *
+积极和善于寻找学习机会， 关注培训机会， 结合成长规划， 适时地为自己安排培训和学习， 保持专业知识技能的更新
+  *
+  积极地学习态度并且注意学以致用， 不断探索改善和提高自身的工作效率 *
+  在工作中和平时的学习积累过程中找寻有价值的信息 *
+  能恰当地质疑已存在的解决问题模式， 以创新的角度进行思考， 对当前业务领域的技术或方式提出创新的方法或思路 *
+  在一些问题上能灵活变通， 积极响应创新 "
+
+
+列举相关实践项目、 总结和思考
+  

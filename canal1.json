@@ -1,0 +1,106 @@
+[
+  {
+    "biz": "efp_sync",
+    "queue": "efp_es_sync_queue_test",
+    "follows": {
+      "to8to": {
+        "to8to_xiaoguotu": ["INSERT", "UPDATE", "DELETE"]
+      }
+    }
+  },
+  {
+    "biz": "crm_apply",
+    "queue": "crm_apply_syc_test",
+    "follows": {
+      "to8to": {
+        "to8to_yuyue_apply": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_yuyue_apply_ext": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_yuyue_apply_fp": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_yuyue_apply_service": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_yuyue_apply_level": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_project_src": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_jj_smt_zb": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_fcom": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_zxb_order": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_skipout_item_record": ["INSERT", "UPDATE", "DELETE"]
+      }
+    }
+  },
+  {
+    "biz": "msgc",
+    "queue": "msgsync_test",
+    "follows": {
+      "msg_center": {
+        "msgc_message_record": ["INSERT", "UPDATE"],
+        "msgc_app_record": ["INSERT", "UPDATE"]
+      }
+    }
+  },
+  {
+    "biz": "canal1_com.yugong.clock",
+    "queue": "crm_mysqles_syn_test",
+    "follows": {
+      "to8to": {
+        "to8to_yuyue_apply": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_yuyue_apply_clock": ["INSERT", "UPDATE", "DELETE"]
+      }
+    }
+  },
+  {
+    "biz": "canal1_com.yugong.company",
+    "queue": "crm_mysqles_syn_test",
+    "follows": {
+      "to8to": {
+        "to8to_fcom": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_zxgs_label": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_user_info": ["INSERT", "UPDATE", "DELETE"]
+      }
+    }
+  },
+  {
+    "biz": "t8t_fi_acc_sync3",
+    "queue": "t8t_fi_acc_sync_uat",
+    "follows": {
+      "t8t_fi_acc": {
+        "acc_account": ["INSERT", "UPDATE"],
+        "acc_transaction_record": ["INSERT"]
+      }
+    }
+  }
+]
+
+
+    {
+        "biz": "efp_sync",
+        "queue": "efp_es_sync_queue",
+        "follows": {
+            "to8to": {
+                "to8to_xiaoguotu": [
+                    "INSERT",
+                    "UPDATE",
+                    "DELETE"
+                ]
+            }
+        }
+    }
+
+    {
+        "clientIds":[
+            "im-21396-oa-app",
+            "im-21396-CloudRabbit-cli"
+        ],
+        "message":"{"appId":3,"content":"{"des":"测试测试","moreBtnName":"查看详情","source":"云兔","sourceImg":"http://img/img/x.jpg","subject":"BD拜访"}","createTime":1514357543203,"gid":0,"id":395589738771255296,"sendTime":1514357543203,"sessionId":0,"sid":0,"tableNo":92,"type":10}"
+    }
+
+    {
+        "appId":3,
+        "content":"{\"des\":\"测试测试\",\"moreBtnName\":\"查看详情\",\"source\":\"云兔\",\"sourceImg\":\"http://img/img/x.jpg\",\"subject\":\"BD拜访\"}",
+        "did":21396,
+        "gid":0,
+        "id":395610821574529024,
+        "sendTime":1514362569943,
+        "sessionId":0,
+        "sid":0,
+        "tableNo":92,
+        "type":10
+    }

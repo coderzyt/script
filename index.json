@@ -1,0 +1,468 @@
+curl -X PUT http://192.168.1.36:9200/search_test_v171120 \
+  -H 'content-type: application/json' \
+  -d '
+{
+    "settings" : {
+      "index" : {
+        "refresh_interval" : "1",
+        "number_of_shards" : "5",
+        "number_of_replicas" : "1"
+      }
+    },
+    "mappings" : {
+      "deco_company" : {
+        "properties" : {
+          "adds" : {
+            "type" : "string"
+          },
+          "areaid" : {
+            "type" : "long"
+          },
+          "casenum" : {
+            "type" : "long"
+          },
+          "city" : {
+            "type" : "string"
+          },
+          "cjjw" : {
+            "type" : "string",
+            "index" : "not_analyzed",
+            "fields" : {
+              "raw" : {
+                "type" : "string",
+                "index_options" : "offsets",
+                "analyzer" : "ik"
+              }
+            }
+          },
+          "cjjwsx" : {
+            "type" : "long"
+          },
+          "cjjwxx" : {
+            "type" : "long"
+          },
+          "cname" : {
+            "type" : "string",
+            "index" : "not_analyzed",
+            "fields" : {
+              "raw" : {
+                "type" : "string",
+                "index_options" : "offsets",
+                "analyzer" : "ik"
+              }
+            }
+          },
+          "comment_good_rate" : {
+            "type" : "long"
+          },
+          "construct_avg" : {
+            "type" : "long"
+          },
+          "credit_level" : {
+            "type" : "long"
+          },
+          "credits" : {
+            "type" : "long"
+          },
+          "cxbzj" : {
+            "type" : "double"
+          },
+          "design_avg" : {
+            "type" : "long"
+          },
+          "downline" : {
+            "type" : "byte"
+          },
+          "fg" : {
+            "type" : "string",
+            "index" : "not_analyzed",
+            "fields" : {
+              "raw" : {
+                "type" : "string",
+                "index_options" : "offsets",
+                "analyzer" : "ik"
+              }
+            }
+          },
+          "fwqy" : {
+            "type" : "string",
+            "index" : "not_analyzed",
+            "fields" : {
+              "raw" : {
+                "type" : "string",
+                "index_options" : "offsets",
+                "analyzer" : "ik"
+              }
+            }
+          },
+          "fz_city" : {
+            "type" : "long"
+          },
+          "gdnum" : {
+            "type" : "long"
+          },
+          "goodlevel" : {
+            "type" : "byte"
+          },
+          "grade" : {
+            "type" : "long"
+          },
+          "hadcooperate" : {
+            "type" : "byte"
+          },
+          "hq" : {
+            "type" : "byte"
+          },
+          "hz_cjjw" : {
+            "type" : "string",
+            "index" : "not_analyzed",
+            "fields" : {
+              "raw" : {
+                "type" : "string",
+                "index_options" : "offsets",
+                "analyzer" : "ik"
+              }
+            }
+          },
+          "hz_fg" : {
+            "type" : "string",
+            "index" : "not_analyzed",
+            "fields" : {
+              "raw" : {
+                "type" : "string",
+                "index_options" : "offsets",
+                "analyzer" : "ik"
+              }
+            }
+          },
+          "hz_fwqy" : {
+            "type" : "string",
+            "index" : "not_analyzed",
+            "fields" : {
+              "raw" : {
+                "type" : "string",
+                "index_options" : "offsets",
+                "analyzer" : "ik"
+              }
+            }
+          },
+          "hz_gzywfw" : {
+            "type" : "string",
+            "index" : "not_analyzed",
+            "fields" : {
+              "raw" : {
+                "type" : "string",
+                "index_options" : "offsets",
+                "analyzer" : "ik"
+              }
+            }
+          },
+          "gzywfw" : {
+            "type" : "string",
+            "index" : "not_analyzed",
+            "fields" : {
+              "raw" : {
+                "type" : "string",
+                "index_options" : "offsets",
+                "analyzer" : "ik"
+              }
+            }
+          },
+          "hz_jzywfw" : {
+            "type" : "string",
+            "index" : "not_analyzed",
+            "fields" : {
+              "raw" : {
+                "type" : "string",
+                "index_options" : "offsets",
+                "analyzer" : "ik"
+              }
+            }
+          },
+          "id" : {
+            "type" : "long"
+          },
+          "ispass" : {
+            "type" : "byte"
+          },
+          "isrq" : {
+            "type" : "byte"
+          },
+          "jointime" : {
+            "type" : "long"
+          },
+          "jolongime" : {
+            "type" : "long"
+          },
+          "jzywfw" : {
+            "type" : "string",
+            "index" : "not_analyzed",
+            "fields" : {
+              "raw" : {
+                "type" : "string",
+                "index_options" : "offsets",
+                "analyzer" : "ik"
+              }
+            }
+          },
+          "kbpf" : {
+            "type" : "double"
+          },
+          "koubei" : {
+            "type" : "long"
+          },
+          "laidian_price" : {
+            "type" : "long"
+          },
+          "location" : {
+            "type" : "geo_point"
+          },
+          "near_yw_nums" : {
+            "type" : "long"
+          },
+          "omod" : {
+            "type" : "byte"
+          },
+          "pattern" : {
+            "type" : "long"
+          },
+          "qg_kbpf" : {
+            "type" : "long"
+          },
+          "service_avg" : {
+            "type" : "long"
+          },
+          "sort_price" : {
+            "type" : "double"
+          },
+          "total_laidian" : {
+            "type" : "long"
+          },
+          "town" : {
+            "type" : "string"
+          },
+          "update_time" : {
+            "type" : "long"
+          },
+          "viewnums" : {
+            "type" : "long"
+          },
+          "weight" : {
+            "type" : "long"
+          },
+          "xaxis" : {
+            "type" : "double"
+          },
+          "xinyon" : {
+            "type" : "double"
+          },
+          "xinyon_net_added" : {
+            "type" : "long"
+          },
+          "yaxis" : {
+            "type" : "double"
+          },
+          "youhui" : {
+            "type" : "long"
+          },
+          "yuyue_nums" : {
+            "type" : "long"
+          },
+          "yw_nums" : {
+            "type" : "long"
+          },
+          "zb_num" : {
+            "type" : "long"
+          },
+          "zzzs" : {
+            "type" : "byte"
+          }
+        }
+      },
+      "xiaoguotu" : {
+        "dynamic_templates" : [ {
+          "not_analyzed" : {
+            "mapping" : {
+              "index" : "not_analyzed"
+            },
+            "match" : "*"
+          }
+        } ],
+        "properties" : {
+          "album_pic_num" : {
+            "type" : "long"
+          },
+          "caseid" : {
+            "type" : "long"
+          },
+          "category" : {
+            "type" : "byte"
+          },
+          "color_id" : {
+            "type" : "byte"
+          },
+          "comment_app" : {
+            "type" : "long"
+          },
+          "commentnum" : {
+            "type" : "long"
+          },
+          "depict" : {
+            "type" : "string",
+            "index" : "not_analyzed",
+            "fields" : {
+              "raw" : {
+                "type" : "string",
+                "analyzer" : "ik"
+              }
+            }
+          },
+          "direction" : {
+            "type" : "string",
+            "index" : "not_analyzed",
+            "fields" : {
+              "raw" : {
+                "type" : "string",
+                "analyzer" : "ik"
+              }
+            }
+          },
+          "edittime" : {
+            "type" : "long"
+          },
+          "filename" : {
+            "type" : "string",
+            "index" : "not_analyzed"
+          },
+          "height" : {
+            "type" : "long"
+          },
+          "hw1" : {
+            "type" : "long"
+          },
+          "hw2" : {
+            "type" : "long"
+          },
+          "hxid" : {
+            "type" : "long"
+          },
+          "issmall" : {
+            "type" : "byte"
+          },
+          "likenum" : {
+            "type" : "long"
+          },
+          "msmq_id" : {
+            "type" : "long"
+          },
+          "nick" : {
+            "type" : "string",
+            "index" : "not_analyzed",
+            "fields" : {
+              "raw" : {
+                "type" : "string",
+                "analyzer" : "ik"
+              }
+            }
+          },
+          "oarea" : {
+            "type" : "byte"
+          },
+          "oldaid" : {
+            "type" : "long"
+          },
+          "oldcid" : {
+            "type" : "long"
+          },
+          "opriceid" : {
+            "type" : "byte"
+          },
+          "partid" : {
+            "type" : "long"
+          },
+          "pha_hash" : {
+            "type" : "string",
+            "index" : "not_analyzed"
+          },
+          "pid" : {
+            "type" : "long"
+          },
+          "pushed" : {
+            "type" : "byte"
+          },
+          "source" : {
+            "type" : "byte"
+          },
+          "styleid" : {
+            "type" : "byte"
+          },
+          "title" : {
+            "type" : "string",
+            "index" : "not_analyzed",
+            "fields" : {
+              "raw" : {
+                "type" : "string",
+                "analyzer" : "ik"
+              }
+            }
+          },
+          "uid" : {
+            "type" : "long"
+          },
+          "update_time" : {
+            "type" : "long"
+          },
+          "visible" : {
+            "type" : "byte"
+          },
+          "wh" : {
+            "type" : "byte"
+          },
+          "wh2" : {
+            "type" : "long"
+          },
+          "wh3" : {
+            "type" : "double"
+          },
+          "width" : {
+            "type" : "long"
+          },
+          "xiaoguo_tj" : {
+            "type" : "byte"
+          },
+          "yuyue_num" : {
+            "type" : "long"
+          },
+          "zoneid" : {
+            "type" : "byte"
+          }
+        }
+      },
+      "news" : {
+        "properties" : {
+          "art_type" : {
+            "type" : "long"
+          },
+          "article_id" : {
+            "type" : "long"
+          },
+          "puttime" : {
+            "type" : "long"
+          },
+          "stype" : {
+            "type" : "long"
+          },
+          "summary" : {
+            "type" : "string"
+          },
+          "thumb" : {
+            "type" : "string",
+            "index" : "no"
+          },
+          "title" : {
+            "type" : "string"
+          }
+        }
+      }
+    }
+}'

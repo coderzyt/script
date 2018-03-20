@@ -1,0 +1,470 @@
+{
+    "deco_company": {
+        "properties": {
+            "viewnums": {
+                "type": "long"
+            },
+            "cjjwxx": {
+                "type": "long"
+            },
+            "comment_good_rate": {
+                "type": "double"
+            },
+            "omod": {
+                "type": "byte"
+            },
+            "fwqy": {
+                "index": "not_analyzed",
+                "type": "string",
+                "fields": {
+                    "raw": {
+                        "analyzer": "ik",
+                        "type": "string",
+                        "index_options": "offsets"
+                    }
+                }
+            },
+            "hq": {
+                "type": "byte"
+            },
+            "downline": {
+                "type": "byte"
+            },
+            "ispass": {
+                "type": "byte"
+            },
+            "hz_gzywfw": {
+                "index": "not_analyzed",
+                "type": "string",
+                "fields": {
+                    "raw": {
+                        "analyzer": "ik",
+                        "type": "string",
+                        "index_options": "offsets"
+                    }
+                }
+            },
+            "design_avg": {
+                "type": "long"
+            },
+            "areaid": {
+                "type": "long"
+            },
+            "yuyue_nums": {
+                "type": "long"
+            },
+            "credit_level": {
+                "type": "long"
+            },
+            "xinyon": {
+                "type": "double"
+            },
+            "id": {
+                "type": "long"
+            },
+            "construct_avg": {
+                "type": "long"
+            },
+            "hz_cjjw": {
+                "index": "not_analyzed",
+                "type": "string",
+                "fields": {
+                    "raw": {
+                        "analyzer": "ik",
+                        "type": "string",
+                        "index_options": "offsets"
+                    }
+                }
+            },
+            "jolongime": {
+                "type": "long"
+            },
+            "fz_city": {
+                "type": "long"
+            },
+            "goodlevel": {
+                "type": "byte"
+            },
+            "xinyon_net_added": {
+                "type": "long"
+            },
+            "town": {
+                "type": "string"
+            },
+            "weight": {
+                "type": "long"
+            },
+            "near_yw_nums": {
+                "type": "long"
+            },
+            "cjjwsx": {
+                "type": "long"
+            },
+            "zb_num": {
+                "type": "long"
+            },
+            "laidian_price": {
+                "type": "long"
+            },
+            "youhui": {
+                "type": "long"
+            },
+            "grade": {
+                "type": "long"
+            },
+            "koubei": {
+                "type": "long"
+            },
+            "hadcooperate": {
+                "type": "byte"
+            },
+            "kbpf": {
+                "type": "double"
+            },
+            "zzzs": {
+                "type": "byte"
+            },
+            "fg": {
+                "index": "not_analyzed",
+                "type": "string",
+                "fields": {
+                    "raw": {
+                        "analyzer": "ik",
+                        "type": "string",
+                        "index_options": "offsets"
+                    }
+                }
+            },
+            "casenum": {
+                "type": "long"
+            },
+            "city": {
+                "type": "string"
+            },
+            "qg_kbpf": {
+                "type": "long"
+            },
+            "cname": {
+                "index": "not_analyzed",
+                "type": "string",
+                "fields": {
+                    "raw": {
+                        "analyzer": "ik",
+                        "type": "string",
+                        "index_options": "offsets"
+                    }
+                }
+            },
+            "pattern": {
+                "type": "long"
+            },
+            "yaxis": {
+                "type": "double"
+            },
+            "gzywfw": {
+                "index": "not_analyzed",
+                "type": "string",
+                "fields": {
+                    "raw": {
+                        "analyzer": "ik",
+                        "type": "string",
+                        "index_options": "offsets"
+                    }
+                }
+            },
+            "xaxis": {
+                "type": "double"
+            },
+            "hz_jzywfw": {
+                "index": "not_analyzed",
+                "type": "string",
+                "fields": {
+                    "raw": {
+                        "analyzer": "ik",
+                        "type": "string",
+                        "index_options": "offsets"
+                    }
+                }
+            },
+            "update_time": {
+                "type": "long"
+            },
+            "gdnum": {
+                "type": "long"
+            },
+            "credits": {
+                "type": "long"
+            },
+            "cxbzj": {
+                "type": "double"
+            },
+            "sort_price": {
+                "type": "double"
+            },
+            "isrq": {
+                "type": "byte"
+            },
+            "cjjw": {
+                "index": "not_analyzed",
+                "type": "string",
+                "fields": {
+                    "raw": {
+                        "analyzer": "ik",
+                        "type": "string",
+                        "index_options": "offsets"
+                    }
+                }
+            },
+            "service_avg": {
+                "type": "long"
+            },
+            "adds": {
+                "type": "string"
+            },
+            "hz_fwqy": {
+                "index": "not_analyzed",
+                "type": "string",
+                "fields": {
+                    "raw": {
+                        "analyzer": "ik",
+                        "type": "string",
+                        "index_options": "offsets"
+                    }
+                }
+            },
+            "total_laidian": {
+                "type": "long"
+            },
+            "jzywfw": {
+                "index": "not_analyzed",
+                "type": "string",
+                "fields": {
+                    "raw": {
+                        "analyzer": "ik",
+                        "type": "string",
+                        "index_options": "offsets"
+                    }
+                }
+            },
+            "jointime": {
+                "type": "long"
+            },
+            "location": {
+                "type": "geo_point"
+            },
+            "hz_fg": {
+                "index": "not_analyzed",
+                "type": "string",
+                "fields": {
+                    "raw": {
+                        "analyzer": "ik",
+                        "type": "string",
+                        "index_options": "offsets"
+                    }
+                }
+            },
+            "yw_nums": {
+                "type": "long"
+            }
+        }
+    },
+    "ask_dev_20170814": {
+        "properties": {
+            "relatedArticle": {
+                "index": "not_analyzed",
+                "type": "string"
+            },
+            "relatedVideo": {
+                "index": "not_analyzed",
+                "type": "string"
+            }
+        }
+    },
+    "xiaoguotu": {
+        "dynamic_templates": [
+            {
+                "not_analyzed": {
+                    "mapping": {
+                        "index": "not_analyzed"
+                    },
+                    "match": "*"
+                }
+            }
+        ],
+        "properties": {
+            "wh2": {
+                "type": "long"
+            },
+            "hw2": {
+                "type": "double"
+            },
+            "depict": {
+                "index": "not_analyzed",
+                "type": "string",
+                "fields": {
+                    "raw": {
+                        "analyzer": "standard",
+                        "type": "string"
+                    }
+                }
+            },
+            "hw1": {
+                "type": "long"
+            },
+            "wh3": {
+                "type": "double"
+            },
+            "yuyue_num": {
+                "type": "long"
+            },
+            "msmq_id": {
+                "type": "long"
+            },
+            "pid": {
+                "type": "long"
+            },
+            "source": {
+                "type": "byte"
+            },
+            "title": {
+                "index": "not_analyzed",
+                "type": "string",
+                "fields": {
+                    "raw": {
+                        "analyzer": "standard",
+                        "type": "string"
+                    }
+                }
+            },
+            "opriceid": {
+                "type": "byte"
+            },
+            "nick": {
+                "index": "not_analyzed",
+                "type": "string",
+                "fields": {
+                    "raw": {
+                        "analyzer": "standard",
+                        "type": "string"
+                    }
+                }
+            },
+            "uid": {
+                "type": "long"
+            },
+            "wh": {
+                "type": "byte"
+            },
+            "update_time": {
+                "type": "long"
+            },
+            "pha_hash": {
+                "index": "not_analyzed",
+                "type": "string"
+            },
+            "hxid": {
+                "type": "long"
+            },
+            "edittime": {
+                "type": "long"
+            },
+            "commentnum": {
+                "type": "long"
+            },
+            "direction": {
+                "index": "not_analyzed",
+                "type": "string",
+                "fields": {
+                    "raw": {
+                        "analyzer": "standard",
+                        "type": "string"
+                    }
+                }
+            },
+            "height": {
+                "type": "long"
+            },
+            "xiaoguo_tj": {
+                "type": "byte"
+            },
+            "visible": {
+                "type": "byte"
+            },
+            "partid": {
+                "type": "long"
+            },
+            "comment_app": {
+                "type": "long"
+            },
+            "album_pic_num": {
+                "type": "long"
+            },
+            "issmall": {
+                "type": "byte"
+            },
+            "likenum": {
+                "type": "long"
+            },
+            "color_id": {
+                "type": "byte"
+            },
+            "filename": {
+                "index": "not_analyzed",
+                "type": "string"
+            },
+            "oarea": {
+                "type": "byte"
+            },
+            "styleid": {
+                "type": "byte"
+            },
+            "caseid": {
+                "type": "long"
+            },
+            "width": {
+                "type": "long"
+            },
+            "zoneid": {
+                "type": "byte"
+            },
+            "category": {
+                "type": "byte"
+            },
+            "pushed": {
+                "type": "byte"
+            },
+            "oldcid": {
+                "type": "long"
+            },
+            "oldaid": {
+                "type": "long"
+            }
+        }
+    },
+    "news": {
+        "properties": {
+            "article_id": {
+                "type": "long"
+            },
+            "summary": {
+                "type": "string"
+            },
+            "puttime": {
+                "type": "long"
+            },
+            "thumb": {
+                "index": "no",
+                "type": "string"
+            },
+            "stype": {
+                "type": "long"
+            },
+            "title": {
+                "type": "string"
+            },
+            "art_type": {
+                "type": "long"
+            }
+        }
+    }
+}

@@ -1,0 +1,603 @@
+{
+    "executableJarName": "workspace_tim.jar-EXECUTABLE",
+    "jreExecutablePath": "../MacOS/云兔",
+    "jvmArgs":"-Djava.ext.dirs=.\lib\ext\ -Xms64m -Xmx256m -XX:NewRatio=3 -Xloggc:.\logs.gc.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseParNewGC -XX:+CMSParallelRemarkEnabled -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=.\logs",
+    "md5Digest": "e2c683137a72d670b507d5d63c9c8ea4",
+    "resourceUrl": "http://pic.to8to.com/app/ios/workspace_tim.jar.zip",
+    "updateInfo":"升级版本号：V341、 新增新消息任务栏闪烁提醒2、 解决了一些已知问题",
+    "updateJarUrl":"http: //downloadapps.to8to.com/app/ios/update-V1.jar",
+    "version":"34"
+}
+
+
+{
+    "args": {
+        "uid": 111,
+        "type": "all",
+        "ssid": "all"
+    }
+}
+{
+    "result": {
+        "router": { 
+            "up_speed": 111, 
+            "down_speed": 111
+        },
+        "online": [
+            { 
+                "dev_brand": "", 
+                "dev_name": "", 
+                "dev_freq": "", 
+                "dev_signal": "", 
+                "online_time": 111, 
+                "down_speed": 11111,
+                "is_limit":  1 / 0, 
+                "is_control": 1 / 0, 
+                "is_black": 1 / 0
+            },
+            ...
+        ],
+        "offline": [
+            { 
+                "dev_brand": "", 
+                "dev_name": "", 
+                "dev_freq": "", 
+                "offline_time": 111, 
+                "is_limit":  1 / 0, 
+                "is_control": 1 / 0, 
+                "is_black": 1 / 0
+            },
+        ]
+    },
+    "status": 200
+}
+
+
+{
+    "args": {
+        "uid": 111,
+        "dev_id": 222
+    }
+}
+
+{
+    "result": {
+        "up_speed": 222,
+        "down_speed": 222,
+        "is_online": 0 / 1,
+        "online_time": 111,
+        "offline_time": 111,
+        "is_limit": 0 / 1,
+        "up_limit": 111,
+        "down_limit": 111,
+        "is_black": 0 / 1,
+        "is_control": 0 / 1,
+        "is_remind": 0 / 1,
+        "dev_name": "sss",
+        "dev_ip": "sss",
+        "dev_mac": "sss",
+        "dev_brand": "sss",
+        "dev_id": 111
+    },
+    "status": 200
+}
+
+
+{
+    "args": {
+        "uid": 111,
+        "is_control": 1,
+		"is_black": 1
+    }
+}
+
+{
+    "result": [
+        {
+            "dev_id": 111,
+            "dev_name": "sss",
+            "dev_mac": "sss",
+            "dev_ip": "sss",
+            "is_prio": 0 / 1     // 当is_prio=“1”时，表示该设备为一键加速设备。
+        }
+    ],
+    "status": 200
+}
+
+{
+    "args": {
+        "uid": 111,
+        "wifiDevice": {
+            "dev_id": 111,
+            "is_limit": 0 / 1,
+            "up_limit": 111,
+            "down_limit": 111,
+            "is_black": 0 / 1,
+            "is_remind": 0 / 1,
+            "dev_name": "sss",
+            "dev_brand": "sss"
+        }
+    }
+}
+
+{
+    "result": 1,
+    "status": 200
+}
+
+{
+    "args": {
+        "uid": 111
+    }
+}
+
+{
+    "result": [
+        {
+            "dev_id": 111,
+            "name": "sss",
+            "mac": "sss",
+            "ip": "sss",
+            "sys_state": "sss",
+            "link_state": "sss",
+            "is_main": 0 / 1
+        },
+        ...
+    ],
+    "status": 200
+}
+
+{
+    "args": {
+        "uid": 111
+    }
+}
+
+{
+    "result": {
+        "name": "sss",
+        "software": "sss",
+        "hardware": "sss",
+        "uptime": 111,
+        "lan_mac": "sss",
+        "wan_mac": "sss",
+        "cur_version": "sss",
+        "new_version": "sss",
+        "auto_enable": 0 / 1
+    },
+    "status": 200
+}
+
+{
+    "args": {
+        "uid": 111,
+        "dto": {
+            "action": "set",
+            "admin_passwd": "sss",
+            "auto_upgrade": 0 / 1,
+            "wake_id": 111,    
+            "wake_enable": 0 / 1 
+        }
+    }
+}
+
+{
+    "result": 1,
+    "status": 200
+}
+
+{
+    "args": {
+        "uid": 111,
+        "wifiInfo": {
+            "default": {
+                "mixed": 0 / 1
+            },
+            "2g": {
+                    "enable": 0 / 1,
+                    "hidden": 0 / 1,
+                    "ssid": "sss",
+                    "encrypt": 0 / 1,
+                    "key": "sss",
+                    "is_timer": 0 / 1,
+                    "start_time": 111,
+                    "stop_time": 111,
+                    "weekdays": ["mon"，"tue"，"wed"，"thu"，"fri"，"sat"，"sun"]
+            },
+            "5g": {
+                    "enable": 0 / 1,
+                    "hidden": 0 / 1,
+                    "ssid": "sss",
+                    "encrypt": 0 / 1,
+                    "key": "sss",
+                    "is_timer": 0 / 1,
+                    "start_time": 111,
+                    "stop_time": 111,
+                    "weekdays": ["mon"，"tue"，"wed"，"thu"，"fri"，"sat"，"sun"]
+            },
+            "guest": {
+                "enable": 0 / 1,
+                "hidden": 0 / 1,
+                "ssid": "sss",
+                "encrypt": 0 / 1,
+                "key": "sss",
+                "is_limit": 0 / 1,
+                "up_limit": 111,
+                "down_limit": 111,
+                "length_time": 111
+            }
+        }
+    }
+}
+
+{
+    "result": 1,
+    "status": 200
+}
+
+{
+    "args": {
+        "uid": 111
+    }
+}
+
+{
+    "result": {
+        "default": {
+            "mixed": 0 / 1
+        },
+        "2g": {
+            "enable": 0 / 1,
+            "hidden": 0 / 1,
+            "ssid": "sss",
+            "encrypt": 0 / 1,
+            "key": "sss",
+            "is_timer": 0 / 1,
+            "start_time": 111,
+            "stop_time": 111,
+            "weekdays": ["mon"，"tue"，"wed"，"thu"，"fri"，"sat"，"sun"]
+        },
+        "5g": {
+            "enable": 0 / 1,
+            "hidden": 0 / 1,
+            "ssid": "sss",
+            "encrypt": 0 / 1,
+            "key": "sss",
+            "is_timer": 0 / 1,
+            "start_time": 111,
+            "stop_time": 111,
+            "weekdays": ["mon"，"tue"，"wed"，"thu"，"fri"，"sat"，"sun"]
+        },
+        "guest": {
+            "enable": 0 / 1,
+            "hidden": 0 / 1,
+            "ssid": "sss",
+            "encrypt": 0 / 1,
+            "key": "sss",
+            "is_limit": 0 / 1,
+            "up_limit": 111,
+            "down_limit": 111,
+            "length_time": 111
+        }
+    },
+    "status": 200
+}
+
+{
+    "args": {
+        "uid": 111
+    }
+}
+
+{
+    "result": {
+        "proto": "dhcp"
+    },
+    "status": 200
+}
+
+{
+    "result": {
+        "proto": "pppoe",
+        "username": "admin",
+        "password": "admin123",
+        "mtu":  "sss",
+        "service ": "sss"
+    },
+    "status": 200
+}
+
+{
+    "result": {
+        "proto": "static",
+        "ipaddr": "192.168.1.1",
+        "netmask": "5.5.5.5",
+        "gateway": "1.1.1.1",
+        "dns1": "sss",
+        "dns2": "sss"
+    },
+    "status": 200
+}
+
+{
+    "args": {
+        "uid": 111,
+        "networkWan": {
+            "proto": "dhcp"
+        }
+    }
+}
+
+{
+    "args": {
+        "uid": 111,
+        "networkWan": {
+            "proto": "pppoe",
+            "username": "admin",
+            "password": "admin123",
+            "mtu":  "sss",
+            "service ": "sss"
+        }
+    }
+}
+
+{
+    "args": {
+        "uid": 111,
+        "networkWan": {
+            "proto": "static",
+            "ipaddr": "192.168.1.1",
+            "netmask": "5.5.5.5",
+            "gateway": "1.1.1.1",
+            "dns1": "sss",
+            "dns2": "sss"
+        }
+    }
+}
+
+{
+    "result": 1,
+    "status": 200
+}
+
+{
+    "args": {
+        "uid": 111,
+        "dev_id": 111
+    }
+}
+
+{
+    "result": 
+    {
+        "dev_id": 111,
+        "forbid": [
+            {
+                "rule_id": 111,
+                "enable": 0 / 1,
+                "start_time": "2时30分",
+                "stop_time": "2时30分",
+                "weekdays": ["mon"，"tue"，"wed"，"thu"，"fri"，"sat"，"sun"]
+            }
+        ],
+        "filter": [
+            {
+                "rule_id": 111,
+                "enable": 0 / 1,
+                "domain": "192.168.1.1",
+            }
+        ]
+    },
+    "status": 200
+}
+
+
+{
+    "args": {
+        "uid": 111,
+        "networkControlRules": {
+            "dev_id": 111,
+            "forbid": [
+                {
+                    "action": "set",
+                    "rule_id": 111,
+                    "enable": 0 / 1,
+                    "start_time": "2时30分",
+                    "stop_time": "2时30分",
+                    "weekdays": ["mon"，"tue"，"wed"，"thu"，"fri"，"sat"，"sun"]
+                }
+            ],
+            "filter": [
+                {
+                    "action": "set",               
+                    "rule_id": 111,
+                    "enable": 0 / 1,
+                    "domain": "192.168.1.1",
+                }
+            ]
+        },
+    }
+}
+
+{
+    "result": {
+        "enable": 0 / 1,
+        "mode": "auto",
+        "up_speed": 111,
+        "down_speed": 111
+    },
+    "status": 200
+}
+
+{
+    "args": {
+        "uid": 111,
+        "networkQos": {
+            "enable": 0 / 1,
+            "mode": "auto",
+            "up_speed": 111,
+            "down_speed": 111
+        }
+    }
+}
+
+{
+    "result": {
+        "up_speed": 111,
+        "down_speed": 111
+    },
+    "status": 200
+}
+
+{
+    "size": 10,
+    "page": 1,
+    "dto": {
+        "fieldsInclude": ["pid", "title", "filename", "caseid", "visible", "oldaid", "oldcid", "height", "width", "album_pic_num"],
+        "termFilter": {
+            "color_id": "7",
+            "visible": 1,
+            "caseid": "",
+            "hxid": "9",
+            "category": 1
+        },
+        "sort": {
+            "edittime": "desc"
+        }
+    }
+}
+
+{
+    "size": 100,
+    "page": 0,
+    "dto": {
+        "fieldsInclude": ["pid", "hxid", "styleid", "zoneid", "color_id", "partid", "oldcid", "oldaid", "filename", "edittime", "update_time", "issmall", "oarea", "caseid", "title", "source", "width", "height"],
+        "termFilter": {
+            "visible": 1,
+            "caseid": 0,
+            "hxid": "8",
+            "category": 1
+        },
+        "sort": {
+            "edittime": "desc"
+        }
+    }
+}
+
+{
+    "from": -100,
+    "size": 100,
+    "query": {
+        "filtered": {
+            "query": {
+                "match_all": {}
+            },
+            "filter": {
+                "bool": {
+                    "must": [{
+                        "term": {
+                            "visible": 1
+                        }
+                    }, {
+                        "term": {
+                            "caseid": 0
+                        }
+                    }, {
+                        "term": {
+                            "hxid": "8"
+                        }
+                    }, {
+                        "term": {
+                            "category": 1
+                        }
+                    }],
+                    "_cache": true
+                }
+            }
+        }
+    },
+    "_source": {
+        "includes": ["pid", "hxid", "styleid", "zoneid", "color_id", "partid", "oldcid", "oldaid", "filename", "edittime", "update_time", "issmall", "oarea", "caseid", "title", "source", "width", "height"],
+        "excludes": []
+    },
+    "sort": [{
+                "edittime": {
+                    "order": "desc"
+                }
+            }]
+            }
+        }
+    }
+}
+
+{
+    "args": {
+        "dto": {
+            "fieldsInclude": ["pid", "hxid", "styleid", "zoneid", "color_id", "partid", "visible", "likenum", "oldcid", "oldaid", "filename", "edittime", "update_time", "issmall", "oarea", "caseid", "title", "source", "width", "height", "album_pic_num", "category"],
+            "sort": {
+                "edittime": "desc"
+            },
+            "termFilter": {
+                "oldcid": 10043951,
+                "caseid": 0,
+                "visible": 1
+            }
+        },
+        "page": 1,
+        "size": 1
+    }
+}
+
+{
+    "service": "com.search",
+    "interface": "company.search2",
+    "return_void": false,
+    "args": {
+        "start": 0,
+        "size": 15,
+        "cname": "华浔",
+        "fz_city": "1121",
+        "return_fields": ["id", "cname"]
+    },
+    "uid": 0,
+    "ip": "127.0.0.1",
+    "tag": "{639EED1B-FFF4-49C3-9361-42D183017695}",
+    "url": "/company/?keyword=%E5%8D%8E%E6%B5%94&location=1"
+}
+
+{
+    "from": -1557320778,
+    "size": 50,
+    "query": {
+        "filtered": {
+            "query": {
+                "bool": {
+                    "must": {
+                        "match": {
+                            "title.raw": {
+                                "query": "儿童卧室榻榻米",
+                                "type": "boolean",
+                                "operator": "AND"
+                            }
+                        }
+                    }
+                }
+            },
+            "filter": {
+                "bool": {
+                    "must": {
+                        "term": {
+                            "visible": 1
+                        }
+                    },
+                    "_cache": true
+                }
+            }
+        }
+    },
+    "_source": {
+        "includes": ["pid", "issmall", "filename", "oldcid", "oldaid", "height", "width", "edittime", "title", "likenum"],
+        "excludes": []
+    }
+}
+

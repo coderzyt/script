@@ -1,0 +1,166 @@
+#!/usr/bin/env bash
+
+if [ $# -lt 2 ] ; then 
+    echo "package.sh [project] [branch] ([tag])"
+    exit
+fi 
+
+
+project=$1
+branch=$2
+
+tag=
+if [ $# -le 3 ] ; then 
+    tag=$3
+fi 
+
+
+rm -rf /root/.m2/repository/com/to8to/*
+
+source_root=/other/git_repo
+target_root=/other/git_publish
+
+local_release_base=${target_root}/${project}-release
+
+source_base=${source_root}/${project}/target/${project}
+target_base=${local_release_base}/apps/${project}
+
+echo "====================================== package project=${project}, branch=${branch}, tag=${tag} ============================="
+
+current=`pwd`
+
+echo -e "\n<<<<<<第1步.判断本地git仓库是否已经clone下来，如果没有，则进行clone ......开始!>>>>>>\n"
+
+if [ ! -d ${source_root}/${project} ]; then  
+    echo "项目git仓库目录${source_root}/${project}不存在，进行clone..."
+    cd ${source_root}
+    echo "git clone git@repo.we.com:java/${project}.git -b ${branch}"
+    git clone git@repo.we.com:java/${project}.git -b ${branch}
+fi 
+
+if [ ! -d ${local_release_base} ]; then  
+    echo "项目git仓库目录${source_root}/${project}不存在，进行clone..."
+    cd ${target_root}
+    echo "git clone git@repo.we.com:publish/${project}-release.git"
+    git clone git@repo.we.com:publish/${project}-release.git
+fi 
+
+echo -e "\n<<<<<<第1步.判断本地git仓库是否已经clone下来，如果没有，则进行clone ......完成!>>>>>>\n"
+
+echo -e "\n<<<<<<第2步.拉取git最新代码 ......开始!>>>>>>\n"
+
+##1.拉取最新的代码
+cd ${source_root}/${project}
+git checkout ${branch}
+git reset origin/${branch} --hard
+git pull origin ${branch} --tags && git log --pretty=oneline -10
+if [ -n "$tag" ]; then 
+    echo "checkout到tag:${tag}..." 
+    git checkout $tag
+fi
+lastlog=`git log --pretty=format:"%s" -1`
+#echo "lastlog:$lastlog"
+
+echo -e "\n<<<<<<第2步.拉取git最新代码 ......完成!>>>>>>\n"
+
+echo -e "\n<<<<<<第3步.执行maven打包 ......开始!>>>>>>\n"
+
+cp -f /other/git_publish/conf.d/package_new.xml package.xml
+git add package.xml && git commit -am "rewrite package.xml" && git push origin ${branch}
+rm -rf ${source_root}/${project}/target
+mvn clean package -Dmaven.test.skip=true -U
+cd ${source_root}/${project}/target
+tar -xf ${project}.tar
+
+echo -e "\n<<<<<<第3步.执行maven打包 ......完成!>>>>>>\n"
+
+echo -e "\n<<<<<<第4步.提取maven打包文件 ......开始!>>>>>>\n"
+
+mkdir -p ${target_base}/bin
+mkdir -p ${target_base}/conf
+mkdir -p ${local_release_base}/libs
+mkdir -p ${local_release_base}/sbin
+######把 拷贝java-server和app-server到项目的sbin下面
+cp /other/git_publish/*-server ${local_release_base}/sbin/
+
+cd ${source_base}
+rm -rf ${target_base}/conf/*
+rm -rf ${target_base}/libs/*
+cp -r conf ${target_base}/
+cp lib/*.jar ${local_release_base}/libs/
+
+jarlist=""
+for file in `ls ${source_base}/lib`
+do
+    jarlist="${jarlist}${file}\n"
+done
+
+if [  -d ${target_base}/conf ]; then  
+    echo -e ${jarlist} > ${target_base}/conf/libs.conf
+    #dos转unix格式
+    dos2unix ${target_base}/conf/mainclass.conf
+fi 
+
+#mainclass以test为参照
+rm -rf $target_base/bin/*
+
+if [ ! -f ${target_base}/conf/mainclass.conf ]; then  
+    echo "[ERROR] mainclass.conf不存在!!!!：${target_base}/conf/mainclass.conf"
+    exit
+fi 
+
+cat ${target_base}/conf/mainclass.conf | while read line
+do
+    if [ "$line" != "" ]
+    then
+        line="${line//=/ }"
+        main=(${line})
+        prefix=${main[0]}
+        instance=${prefix#MAINCLASS-}
+        cp /other/git_publish/app-server-new $target_base/bin/$instance
+        chmod +x $target_base/bin/$instance
+    fi
+done
+
+#instanceNum=`grep -o "=" ${target_base}/conf/mainclass.conf | wc -l`
+#echo "instance num $instanceNum"
+#cat ${target_base}/conf/mainclass.conf | while read line || [[ -n $line ]]
+#do
+#    if [ "$line" != "" ]
+#    if [[ $instanceNum -gt 0 ]]
+#    then
+#        line="${line//=/ }"
+#        main=(${line})
+#        prefix=${main[0]}
+#        instance=${prefix#MAINCLASS-}
+#        cp /other/git_publish/app-server-new $target_base/bin/$instance
+#        chmod +x $target_base/bin/$instance
+#        instanceNum=`expr $instanceNum-1`
+#    fi
+#done
+
+echo -e "\n<<<<<<第4步.提取maven打包文件 ......完成!>>>>>>\n"
+
+echo -e "\n<<<<<<第5步.提交发布版本到发布仓库 ......开始!>>>>>>\n"
+
+cd ${local_release_base}
+
+git add .
+
+gitstatus=`git status`
+result=$(echo $gitstatus | grep "nothing to commit")
+if [[ "$result" != "" ]]
+then
+    echo "[WARN] 发布仓库没有变更，直接退出!"
+    cd $current
+    exit
+fi
+
+time=`date '+%Y%m%d%H%M%S'` 
+git commit -am "package project:${project}, branch:${branch}, tag:${tag}, notes:${lastlog}, time:${time}"
+git tag ${project}--${tag}-${time}
+git pull origin master
+git push origin master --tags
+echo -e "\n<<<<<<第5步.提交发布版本到发布仓库 ......完成!>>>>>>\n"
+
+cd $current

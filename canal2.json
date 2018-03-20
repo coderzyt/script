@@ -1,0 +1,259 @@
+[
+  {
+    "biz": "efp_sync",
+    "queue": "efp_es_sync_queue",
+    "follows": {
+      "to8to": {
+        "to8to_xiaoguotu": ["INSERT", "UPDATE", "DELETE"]
+      }
+    }
+  },
+  {
+    "biz": "crm_apply",
+    "queue": "crm_apply_syc1",
+    "follows": {
+      "to8to": {
+        "to8to_yuyue_apply": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_yuyue_apply_ext": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_yuyue_apply_fp": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_yuyue_apply_service": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_yuyue_apply_level": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_project_src": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_jj_smt_zb": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_fcom": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_zxb_order": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_skipout_item_record": ["INSERT", "UPDATE", "DELETE"]
+      }
+    }
+  },
+  {
+    "biz": "msgc",
+    "queue": "msgsync_dev",
+    "follows": {
+      "msg_center": {
+        "msgc_message_record": ["INSERT", "UPDATE"],
+        "msgc_app_record": ["INSERT", "UPDATE"]
+      }
+    }
+  },
+  {
+    "biz": "husky.apply",
+    "queue": "husky.dev.apply.delta",
+    "follows": {
+      "to8to": {
+        "to8to_apply_config": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_apply_config_node": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_apply_config_ext": ["INSERT", "UPDATE", "DELETE"]
+      }
+    }
+  },
+  {
+    "biz": "canal2_crm_data_57",
+    "queue": "crm_apply_syc",
+    "follows": {
+      "to8to": {
+        "to8to_yuyue_apply": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_yuyue_apply_ext": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_yuyue_apply_fp": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_yuyue_apply_service": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_yuyue_apply_level": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_project_src": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_jj_smt_zb": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_fcom": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_zxb_order": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_skipout_item_record": ["INSERT", "UPDATE", "DELETE"]
+      }
+    }
+  },
+  {
+    "biz": "canal2_com.yugong.clock",
+    "queue": "crm_mysqles_syn",
+    "follows": {
+      "to8to": {
+        "to8to_yuyue_apply": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_yuyue_apply_clock": ["INSERT", "UPDATE", "DELETE"]
+      }
+    }
+  },
+  {
+    "biz": "canal2_com.yugong.company",
+    "queue": "crm_mysqles_syn",
+    "follows": {
+      "to8to": {
+        "to8to_fcom": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_zxgs_label": ["INSERT", "UPDATE", "DELETE"],
+        "to8to_user_info": ["INSERT", "UPDATE", "DELETE"]
+      }
+    }
+  }
+]
+
+
+
+
+
+[
+    {
+        "biz": "efp_sync",
+        "queue": "efp_es_sync_queue_test",
+        "follows": {
+            "to8to": {
+                "to8to_xiaoguotu": [
+                    "INSERT",
+                    "UPDATE",
+                    "DELETE"
+                ],
+                "to8to_xiaoguotu_tage": [
+                    "INSERT",
+                    "UPDATE",
+                    "DELETE"
+                ]
+            }
+        }
+    },
+    {
+        "biz": "crm_apply",
+        "queue": "crm_apply_syc_test",
+        "follows": {
+            "to8to": {
+                "to8to_yuyue_apply": [
+                    "INSERT",
+                    "UPDATE",
+                    "DELETE"
+                ],
+                "to8to_yuyue_apply_ext": [
+                    "INSERT",
+                    "UPDATE",
+                    "DELETE"
+                ],
+                "to8to_yuyue_apply_fp": [
+                    "INSERT",
+                    "UPDATE",
+                    "DELETE"
+                ],
+                "to8to_yuyue_apply_service": [
+                    "INSERT",
+                    "UPDATE",
+                    "DELETE"
+                ],
+                "to8to_yuyue_apply_level": [
+                    "INSERT",
+                    "UPDATE",
+                    "DELETE"
+                ],
+                "to8to_project_src": [
+                    "INSERT",
+                    "UPDATE",
+                    "DELETE"
+                ],
+                "to8to_jj_smt_zb": [
+                    "INSERT",
+                    "UPDATE",
+                    "DELETE"
+                ],
+                "to8to_fcom": [
+                    "INSERT",
+                    "UPDATE",
+                    "DELETE"
+                ],
+                "to8to_zxb_order": [
+                    "INSERT",
+                    "UPDATE",
+                    "DELETE"
+                ],
+                "to8to_skipout_item_record": [
+                    "INSERT",
+                    "UPDATE",
+                    "DELETE"
+                ]
+            }
+        }
+    },
+    {
+        "biz": "msgc",
+        "queue": "msgsync_test",
+        "follows": {
+            "msg_center": {
+                "msgc_message_record": [
+                    "INSERT",
+                    "UPDATE"
+                ],
+                "msgc_app_record": [
+                    "INSERT",
+                    "UPDATE"
+                ]
+            }
+        }
+    },
+    {
+        "biz": "canal1_com.yugong.clock",
+        "queue": "crm_mysqles_syn_test",
+        "follows": {
+            "to8to": {
+                "to8to_yuyue_apply": [
+                    "INSERT",
+                    "UPDATE",
+                    "DELETE"
+                ],
+                "to8to_yuyue_apply_clock": [
+                    "INSERT",
+                    "UPDATE",
+                    "DELETE"
+                ]
+            }
+        }
+    },
+    {
+        "biz": "canal1_com.yugong.company",
+        "queue": "crm_mysqles_syn_test",
+        "follows": {
+            "to8to": {
+                "to8to_fcom": [
+                    "INSERT",
+                    "UPDATE",
+                    "DELETE"
+                ],
+                "to8to_zxgs_label": [
+                    "INSERT",
+                    "UPDATE",
+                    "DELETE"
+                ],
+                "to8to_user_info": [
+                    "INSERT",
+                    "UPDATE",
+                    "DELETE"
+                ]
+            }
+        }
+    }
+]
+
+
+{
+    "service": "com.search",
+    "interface": "company.search2",
+    "return_void": false,
+    "args": {
+        "start": 0,
+        "size": 14,
+        "hq": 1,
+        "fz_city": 1130,
+        "filter_complaint": 1,
+        "cgate": 0,
+        "cname": "",
+        "type": [],
+        "coverage": [],
+        "price": [],
+        "style": [],
+        "areaid": [],
+        "exclude_ids": ["629352"],
+        "latitude": 0,
+        "longitude": 0,
+        "sort": ["hadcooperate:desc", "credit_level:desc", "weight:desc", "xinyon:desc", "zb_num:desc"],
+        "return_fields": ["id"]
+    },
+    "uid": 0,
+    "ip": "119.145.230.168",
+    "tag": "{00C415FF-6270-73D8-AF48-C4CA8EEEA1D9}",
+    "url": "/company/"
+}
