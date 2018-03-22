@@ -13,8 +13,71 @@ HashMap在put一个key时会判断将要放进去的key的hash值和对象地址
 当然HashSet中的Value是一个固定值PRESENT. 所以修改不修改无所谓.
 
 3. HashMap是线程安全的吗, 为什么不是线程安全的(最好画图说明多线程环境下不安全)
+
+不是线程安全的, JDK 1.7 中resize会导致
+
 4. HashMap的扩容过程
+
+首先要了解HashMap的扩容过程，我们就得了解一些HashMap中的变量：
+① Node<K,V>：链表节点，包含了key、value、hash、next指针四个元素
+② table：Node<K,V>类型的数组, 里面的元素是链表, 用于存放HashMap元素的实体
+③ size：记录了放入HashMap的元素个数
+④ loadFactor：负载因子
+⑤ threshold：阈值，决定了HashMap何时扩容, 以及扩容后的大小, 一般等于table大小乘以loadFactor.
+值得注意的是，当我们自定义HashMap初始容量大小时, 构造函数并非直接把我们定义的数值当做HashMap容量大小,
+而是把该数值当做参数调用方法tableSizeFor，然后把返回值作为HashMap的初始容量大小：
+<code>
+/**
+ * Returns a power of two size for the givenk target capacity.
+ */
+static final int tableSizeFor(int cap) {
+    int n = cap - 1;
+    n |= n >>> 1;
+    n |= n >>> 2;
+    n |= n >>> 4;
+    n |= n >>> 8;
+    n |= n >>> 16;
+    return (n < 0) ? 1 : (n >= MAXIMUM_CAPACITY) ? MAXIMUM_CAPACITY : n + 1;
+}
+</code>
+该方法会返回一个大于等于当前参数的2的倍数，因此HashMap中的table数组的容量大小总是2的倍数.
+HashMap使用的是懒加载，构造完HashMap对象后，只要不进行put 方法插入元素之前，HashMap并不会去初始化或者扩容table：
+<code>
+public V put(K key, V value) {
+    return putVal(hash(key), key, value, false, true);
+}
+final V putVal(int hash, K key, V value, boolean onlyIfAbsent, boolean evict) {
+    Node<K,V>[] tab; Node<K,V> p; int n, i;
+    if ((tab = table) == null || (n = tab.length) == 0)
+        n = (tab = resize()).length;
+    if ((p = tab[i = (n - 1) & hash]) == null)
+        tab[i] = newNode(hash, key, value, null);
+    else {
+        ...
+    }
+    ++modCount;
+    if (++size > threshold)
+        resize();
+    afterNodeInsertion(evict);
+    return null;
+}
+</code>
+在putVal方法第8、9行我们可以看到，当首次调用put方法时，HashMap会发现table为空然后调用resize方法进行初始化
+在putVal方法第16、17行我们可以看到，当添加完元素后，如果HashMap发现size（元素总数）大于threshold（阈值），则会调用resize方法进行扩容
+在这里值得注意的是，在putVal方法第10行我们可以看到，插入元素的hash值是一个32位的int值，而实际当前元素插入table的索引的值为 ：
+<code>
+(table.size - 1) & hash
+例如: 01111 & hash 等于hash值的后4位
+</code>
+又由于table的大小一直是2的倍数，2的N次方，因此当前元素插入table的索引的值为其hash值的后N位组成的值
+
 5. HashMap 1.7 与 1.8 的区别, 说明1.8做了哪些优化, 如何优化的?
+
+
+
+
+
+
 6. final finally finalize
 7. 强引用, 软引用, 弱引用, 虚引用
 8. java反射
