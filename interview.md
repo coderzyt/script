@@ -1,6 +1,17 @@
 # java基础
 1. List和Set的区别
+
+List和Set都继承了Collection
+Set是最简单的一种集合, 集合中的对象不按特定的方式排序, 并且没有重复的对象.
+List的特征是其元素以线性方式存储, 集合中可以存放重复对象.
+
 2. HashSet是如何保证不重复的?
+
+在调用HashSet中的add方法时, 实际是在调用 HashMap的put方法, 像hashmap中添加key.
+HashMap在put一个key时会判断将要放进去的key的hash值和对象地址或者内容是否一样,
+则判断出来要添加的Key与HashMap中的Key重复, 把Value的值给替换成最新的.
+当然HashSet中的Value是一个固定值PRESENT. 所以修改不修改无所谓.
+
 3. HashMap是线程安全的吗, 为什么不是线程安全的(最好画图说明多线程环境下不安全)
 4. HashMap的扩容过程
 5. HashMap 1.7 与 1.8 的区别, 说明1.8做了哪些优化, 如何优化的?
