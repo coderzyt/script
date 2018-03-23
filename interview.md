@@ -73,13 +73,62 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent, boolean evict) {
 
 5. HashMap 1.7 与 1.8 的区别, 说明1.8做了哪些优化, 如何优化的?
 
+<<<<<<< HEAD
 
 
 
 
+=======
+在JDK7中, HashMap 的结构都是这么简单, 基于一个数组以及多个链表的实现,
+hash值冲突的时候, 就将对应节点以链表的形式存储. 这样子 HashMap 性能上
+就抱有一定的疑问, 如果说成百上千个节点在 hash 时发生碰撞, 存储于一个链
+表中, 那么如果查找其中一个节点, 那就不可避免的花费O(N)的查找时间, 这将是多么大的性能损失. 这个JDK8中得到了解决. 在最坏的情况下, 查找一个节点的时间复杂度为 O(N), 而红黑树一直是 O(logN), 这样会提高 HashMap 的效率.
+JDK7中 HashMap 采用位桶+链表的方式, 即我们常说的散列链表的方式, JDK8中采用的是位桶+链表/红黑树的方式, 也是非线程安全的. 当某个位桶的链表长度达到某个阈值的时候, 这个链表就将转换成红黑树.
+JDK8中, 当某个 hash 值的节点数不小于8时, 将不再以链表的形式存储, 会被调整成一颗红黑树.
+>>>>>>> 8f668d37c4761c8db71de72cef81f16f8729562f
 
 6. final finally finalize
+
+final 用于修饰类, 成员变量和成员方法. final 修饰的类, 不能被继承, 其中所有的方法都不能被重写, 所以不能同时用 abstract 和 final 修饰类. final 修饰的方法不能被重写, 但是子类可以用父类中 final 修饰的方法. final 修饰的成员变量是不可变的, 如果成员变量是基本数据类型, 初始化后成员变量的值不能被改变, 如果成员变量是引用类型, 那么它只能指向初始化时指向的那个对象, 不能再指向别的对象, 但是对象当中的内容是允许改变的.
+
+finally 通常和 try catch 搭配使用, 保证不管有没有发生异常, 资源都能够被释放
+
+finalize是 Object 类中的一个方法, 子类可以重写 finalize()方法实现对资源的回收. 垃圾回收只负责回收内存, 并不负责资源的回收, 资源回收是由程序员完成. java虚拟机在垃圾回收之前会先调用垃圾对象的 finalize 方法用于使对象释放资源, 自后才进行垃圾回收, 这个方法一般不会显示的调用, 在垃圾回收时垃圾回收器会主动调用.
+
 7. 强引用, 软引用, 弱引用, 虚引用
+
+强引用: 只要引用存在, 垃圾回收器永远不会回收
+Object obj = new Object(); // 可直接通过 obj 取得对应的对象如 obj.equals(new Object());
+而这样 obj 对象是对后面 new Object的一个强引用, 只有当 obj 这个引用被释放之后, 对象才会被释放掉, 这也是我们经常使用的编码形式.
+
+软引用: 非必须引用, 内存溢出之前进行回收, 可以通过以下代码实现
+Object obj = new Object();
+SoftReference<Object> sf = new SoftReference<Object>(obj);
+obj = null;
+sf.get();//有时候会返回null
+这时候sf是对obj的一个软引用，通过sf.get()方法可以取到这个对象，当然，当这个对象被标记为需要回收的对象时，则返回null；
+软引用主要用户实现类似缓存的功能，在内存足够的情况下直接通过软引用取值，无需从繁忙的真实来源查询数据，提升速度；当内存不足时，自动删除这部分缓存数据，从真正的来源查询这些数据。
+
+弱引用：
+第二次垃圾回收时回收，可以通过如下代码实现
+Object obj = new Object();
+WeakReference<Object> wf = new WeakReference<Object>(obj);
+obj = null;
+wf.get();//有时候会返回null
+wf.isEnQueued();//返回是否被垃圾回收器标记为即将回收的垃圾
+弱引用是在第二次垃圾回收时回收，短时间内通过弱引用取对应的数据，可以取到，当执行过第二次垃圾回收时，将返回null。
+弱引用主要用于监控对象是否已经被垃圾回收器标记为即将回收的垃圾，可以通过弱引用的isEnQueued方法返回对象是否被垃圾回收器标记。
+
+虚引用：
+垃圾回收时回收，无法通过引用取到对象值，可以通过如下代码实现
+Object obj = new Object();
+PhantomReference<Object> pf = new PhantomReference<Object>(obj);
+obj=null;
+pf.get();//永远返回null
+pf.isEnQueued();//返回是否从内存中已经删除
+虚引用是每次垃圾回收的时候都会被回收，通过虚引用的get方法永远获取到的数据为null，因此也被成为幽灵引用。
+虚引用主要用于检测对象是否已经从内存中删除。
+
 8. java反射
 9. Array.sort的实现原理和Collection实现原理
 10. LinkedHashMap的应用
