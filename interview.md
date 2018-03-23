@@ -18,17 +18,17 @@ HashMap在put一个key时会判断将要放进去的key的hash值和对象地址
 
 4. HashMap的扩容过程
 
-首先要了解HashMap的扩容过程，我们就得了解一些HashMap中的变量：
-① Node<K,V>：链表节点，包含了key、value、hash、next指针四个元素
+首先要了解HashMap的扩容过程, 我们就得了解一些HashMap中的变量：
+① Node<K,V>：链表节点, 包含了key、value、hash、next指针四个元素
 ② table：Node<K,V>类型的数组, 里面的元素是链表, 用于存放HashMap元素的实体
 ③ size：记录了放入HashMap的元素个数
 ④ loadFactor：负载因子
-⑤ threshold：阈值，决定了HashMap何时扩容, 以及扩容后的大小, 一般等于table大小乘以loadFactor.
-值得注意的是，当我们自定义HashMap初始容量大小时, 构造函数并非直接把我们定义的数值当做HashMap容量大小,
-而是把该数值当做参数调用方法tableSizeFor，然后把返回值作为HashMap的初始容量大小：
+⑤ threshold：阈值, 决定了HashMap何时扩容, 以及扩容后的大小, 一般等于table大小乘以loadFactor.
+值得注意的是, 当我们自定义HashMap初始容量大小时, 构造函数并非直接把我们定义的数值当做HashMap容量大小,
+而是把该数值当做参数调用方法tableSizeFor, 然后把返回值作为HashMap的初始容量大小：
 <code>
 /**
- * Returns a power of two size for the givenk target capacity.
+ *Returns a power of two size for the givenk target capacity.
  */
 static final int tableSizeFor(int cap) {
     int n = cap - 1;
@@ -40,8 +40,8 @@ static final int tableSizeFor(int cap) {
     return (n < 0) ? 1 : (n >= MAXIMUM_CAPACITY) ? MAXIMUM_CAPACITY : n + 1;
 }
 </code>
-该方法会返回一个大于等于当前参数的2的倍数，因此HashMap中的table数组的容量大小总是2的倍数.
-HashMap使用的是懒加载，构造完HashMap对象后，只要不进行put 方法插入元素之前，HashMap并不会去初始化或者扩容table：
+该方法会返回一个大于等于当前参数的2的倍数, 因此HashMap中的table数组的容量大小总是2的倍数.
+HashMap使用的是懒加载, 构造完HashMap对象后, 只要不进行put 方法插入元素之前, HashMap并不会去初始化或者扩容table：
 <code>
 public V put(K key, V value) {
     return putVal(hash(key), key, value, false, true);
@@ -62,14 +62,14 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent, boolean evict) {
     return null;
 }
 </code>
-在putVal方法第8、9行我们可以看到，当首次调用put方法时，HashMap会发现table为空然后调用resize方法进行初始化
-在putVal方法第16、17行我们可以看到，当添加完元素后，如果HashMap发现size（元素总数）大于threshold（阈值），则会调用resize方法进行扩容
-在这里值得注意的是，在putVal方法第10行我们可以看到，插入元素的hash值是一个32位的int值，而实际当前元素插入table的索引的值为 ：
+在putVal方法第8、9行我们可以看到, 当首次调用put方法时, HashMap会发现table为空然后调用resize方法进行初始化
+在putVal方法第16、17行我们可以看到, 当添加完元素后, 如果HashMap发现size（元素总数）大于threshold（阈值）, 则会调用resize方法进行扩容
+在这里值得注意的是, 在putVal方法第10行我们可以看到, 插入元素的hash值是一个32位的int值, 而实际当前元素插入table的索引的值为 ：
 <code>
 (table.size - 1) & hash
 例如: 01111 & hash 等于hash值的后4位
 </code>
-又由于table的大小一直是2的倍数，2的N次方，因此当前元素插入table的索引的值为其hash值的后N位组成的值
+又由于table的大小一直是2的倍数, 2的N次方, 因此当前元素插入table的索引的值为其hash值的后N位组成的值
 
 5. HashMap 1.7 与 1.8 的区别, 说明1.8做了哪些优化, 如何优化的?
 
@@ -99,65 +99,169 @@ Object obj = new Object();
 SoftReference<Object> sf = new SoftReference<Object>(obj);
 obj = null;
 sf.get();//有时候会返回null
-这时候sf是对obj的一个软引用，通过sf.get()方法可以取到这个对象，当然，当这个对象被标记为需要回收的对象时，则返回null；
-软引用主要用户实现类似缓存的功能，在内存足够的情况下直接通过软引用取值，无需从繁忙的真实来源查询数据，提升速度；当内存不足时，自动删除这部分缓存数据，从真正的来源查询这些数据。
+这时候sf是对obj的一个软引用, 通过sf.get()方法可以取到这个对象, 当然, 当这个对象被标记为需要回收的对象时, 则返回null；
+软引用主要用户实现类似缓存的功能, 在内存足够的情况下直接通过软引用取值, 无需从繁忙的真实来源查询数据, 提升速度；当内存不足时, 自动删除这部分缓存数据, 从真正的来源查询这些数据。
 
 弱引用：
-第二次垃圾回收时回收，可以通过如下代码实现
+第二次垃圾回收时回收, 可以通过如下代码实现
 Object obj = new Object();
 WeakReference<Object> wf = new WeakReference<Object>(obj);
 obj = null;
 wf.get();//有时候会返回null
 wf.isEnQueued();//返回是否被垃圾回收器标记为即将回收的垃圾
-弱引用是在第二次垃圾回收时回收，短时间内通过弱引用取对应的数据，可以取到，当执行过第二次垃圾回收时，将返回null。
-弱引用主要用于监控对象是否已经被垃圾回收器标记为即将回收的垃圾，可以通过弱引用的isEnQueued方法返回对象是否被垃圾回收器标记。
+弱引用是在第二次垃圾回收时回收, 短时间内通过弱引用取对应的数据, 可以取到, 当执行过第二次垃圾回收时, 将返回null。
+弱引用主要用于监控对象是否已经被垃圾回收器标记为即将回收的垃圾, 可以通过弱引用的isEnQueued方法返回对象是否被垃圾回收器标记。
 
 虚引用：
-垃圾回收时回收，无法通过引用取到对象值，可以通过如下代码实现
+垃圾回收时回收, 无法通过引用取到对象值, 可以通过如下代码实现
 Object obj = new Object();
 PhantomReference<Object> pf = new PhantomReference<Object>(obj);
 obj=null;
 pf.get();//永远返回null
 pf.isEnQueued();//返回是否从内存中已经删除
-虚引用是每次垃圾回收的时候都会被回收，通过虚引用的get方法永远获取到的数据为null，因此也被成为幽灵引用。
+虚引用是每次垃圾回收的时候都会被回收, 通过虚引用的get方法永远获取到的数据为null, 因此也被成为幽灵引用。
 虚引用主要用于检测对象是否已经从内存中删除。
 
 8. java反射
 
 
 
-
 9. Array.sort的实现原理和Collection实现原理
+
+
+
 10. LinkedHashMap的应用
+
+
+
 11. cloneable接口实现原理
+
+
+
 12. 异常分类以及处理机制
+
+
+
 13. wait和sleep的区别
+
+#### sleep()
+sleep()使当前线程进入停滞状态（阻塞当前线程）, 让出CUP的使用、目的是不让当前线程独自霸占该进程所获的CPU资源,
+以留一定时间给其他线程执行的机会;
+sleep()是Thread类的Static(静态)的方法；因此他不能改变对象的锁状态, 所以当在一个Synchronized块中调用Sleep()方法时,
+线程虽然休眠了, 但是对象的锁并木有被释放, 其他线程无法访问这个对象（即使睡着也持有对象锁）。
+在sleep()休眠时间期满后, 该线程不一定会立即执行, 这是因为其它线程可能正在运行而且没有被调度为放弃执行, 除非此线程
+具有更高的优先级。
+#### wait()
+wait()方法是Object类里的方法；当一个线程执行到wait()方法时，它就进入到一个和该对象相关的等待池中，同时失去（释放）
+了对象的机锁（暂时失去机锁，wait(long timeout)超时时间到后还需要返还对象锁）；其他线程可以访问；
+wait()使用notify或者notifyAlll或者指定睡眠时间来唤醒当前等待机锁k池中的线程。
+wiat()必须放在synchronized block中，否则会在program runtime时扔出"java.lang.IllegalMonitorStateException"异常。
+
+所以sleep()和wait()方法的最大区别是：
+　　　　sleep()睡眠时，保持对象锁，仍然占有该锁；
+　　　　而wait()睡眠时，释放对象锁。
+
 14. 数组在内存中如何分配
 
 Java中数组存储两类事物: 基本数据类型或者引用(对象指针).
 当一个对象通过new 创建, 那么将在堆内存中分配一段空间, 并返回其引用(指针).
-对于数组也是同样的方式. 
-Java中的数组,也是对象(继承Object),因此数组所在的区域和对象是一样的
+对于数组也是同样的方式.
+Java中的数组,也是对象(继承Object),因此数组所在的区域和对象是一样的.
+<code>
+class A {
+    int x;
+    int y;
+}
+public void m1() {
+    int i = 0;
+    m2();
+}
+public void m2() {
+    A a = new A();
+}
+</code>
+上面的代码片段中,让我们执行 m1()方法看看发生了什么:
+    ① 当 m1 被调用时,一个新的栈帧(Frame-1)被压入JVM栈中,当然,相关的局部变量也在 Frame-1中创建, 比如 i;
+    ② 然后 m1调用m2,,又有一个新的栈帧(Frame-2)被压入到JVM栈中;
+    ③ m2方法在堆内存中创建了A类的一个对象,此对象的引用保存在 Frame-2的局部变量 a 中. 此时,堆内存和栈内存
+    看起来如下所示:
+    ![内存图示](stack.png)
 
 # java并发
 1. synchronized的实现原理以及锁优化
+
+
+
 2. volatile的实现原理是
+
+
+
 3. java信号灯
+
+
+
 4. synchronized在静态方法和普通方法的区别
-5. 怎么实现所有线程在等待某个时间的发生才会去执行
+
+
+
+5. 怎么实现所有线程在等待某个时间的发生才会去执行?
+
+
+
 6. CAS? CAS有什么缺陷? 如何解决?
+
+Compare and Swap. 比较并交换
+CAS存在一个逻辑漏洞: 如果一个变量V初次读取的时候是A值, 并且在准备赋值的时候检查到它仍然为A值, 那我们就能说它的值
+没有被其他线程改变过了吗? 如果在这段期间它的值曾经被改成了B, 后来又被改回A, 那CAS操作就会误认为它从来没有被改变过.
+这个漏洞被称为CAS操作的"ABA"的问题.
+java.util.concurrent包为了解决这个问题, 提供了一个带有标记的原子引用类 "AtomicStampedReference", 它可以通过控制
+变量值的版本来保证CAS的正确性. 或者使用 传统的互斥同步.
+
 7. synchronized和lock有什么区别?
+
+
+
 8. HashTable是怎么加锁的?
+
+
+
 9. HashMap的并发问题?
+
+
+
 10. ConcurrentHashMap介绍? 1.8中为什么要用红黑树?
+
+红黑树:
+降低查找同hash值的对象时的时间复杂度, 链表 => 链表/红黑树.
+
 11. AQS
+
+
+
 12. 如何检测死锁? 怎么预防死锁?
+
+
+
 13. java内存模型
+
+
+
 14. 如何保证多线程下i++结果正确
+
+
+
 15. 线程池的种类, 区别和使用场景
+
+
+
 16. 分析线程池的实现原理和线程的调度过程?
 17. 线程池如何调优, 最大数目如何确认?
 18. ThreadLocal原理, 用的时候需要注意什么?
+
+每一个线程的Thread对象都有一个ThreadLocalMap对象, 这个对象存储了一组以ThreadLocal.ThreadLocalHashCode为键, 以
+本地线程变量为值的 K-V 值对, ThreadLocal对象就是当前线程的 ThreadLocalMap的访问入口, 每一个ThreadLocal对象都包含
+一个独一无二的threadLocalHashCode值, 使用这个值就可以在线程 K-V 值中找回对应的本地线程变量.
+
 19. CountDownLatch和CyclicBarrier的用法, 以及相互之间的差别?
 20. LockSupport工具
 21. Condition接口及其实现原理
