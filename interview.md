@@ -256,11 +256,18 @@ java.util.concurrent包为了解决这个问题, 提供了一个带有标记的�
 
 16. 分析线程池的实现原理和线程的调度过程?
 17. 线程池如何调优, 最大数目如何确认?
+
+
+
 18. ThreadLocal原理, 用的时候需要注意什么?
 
 每一个线程的Thread对象都有一个ThreadLocalMap对象, 这个对象存储了一组以ThreadLocal.ThreadLocalHashCode为键, 以
 本地线程变量为值的 K-V 值对, ThreadLocal对象就是当前线程的 ThreadLocalMap的访问入口, 每一个ThreadLocal对象都包含
 一个独一无二的threadLocalHashCode值, 使用这个值就可以在线程 K-V 值中找回对应的本地线程变量.
+
+注意事项:
+① 初始化时, 使用initValue方法
+② 每一个线程都只是使用ThreadLocal标注变量的副本进行计算, 每一个线程的ThreadLocal变量值都是独立的, 不被其他线程影响.
 
 19. CountDownLatch和CyclicBarrier的用法, 以及相互之间的差别?
 20. LockSupport工具
