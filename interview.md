@@ -135,7 +135,26 @@ pf.isEnQueued();//返回是否从内存中已经删除
 
 
 
-9. Array.sort的实现原理和Collection实现原理
+9. Arrays.sort的实现原理和Collection实现原理
+
+Arrays.sort
+数组长度 N < 47 时, 使用插入排序算法
+数组长度 47 < N < 286 时, 使用双轴快速排序算法
+数组长度 N >= 286 时,连续性好用归并排序, 连续性不好用双轴快速排序算法
+
+
+
+
+Collections.sort
+先判断useLegacyMergeSort是否为true, 如果为true就会使用传统归并排序, 如果不为true就会使用叫Timsort算法
+Timsort的核心过程
+Timsort算法为了减少对升序部分的回溯和对降序部分的性能倒退, 将输入按其升序和降序特点进行了分区。排序的输入的单位不是一个个单独的数字，
+而是一个个的块-分区。其中每一个分区叫一个run。针对这些 run 序列，每次拿一个 run 出来按规则进行合并。每次合并会将两个 run合并成一个
+run。合并的结果保存到栈中。合并直到消耗掉所有的 run，这时将栈上剩余的 run合并到只剩一个 run 为止。这时这个仅剩的 run 便是排好序的结果。
+综上述过程，Timsort算法的过程包括
+（0）如何数组长度小于某个值, 直接用二分插入排序算法.
+（1）找到各个run, 并入栈.
+（2）按规则合并run.
 
 
 
@@ -264,6 +283,9 @@ java.util.concurrent包为了解决这个问题, 提供了一个带有标记的�
 
 
 16. 分析线程池的实现原理和线程的调度过程?
+
+
+
 17. 线程池如何调优, 最大数目如何确认?
 
 创建线程及后续的销毁过程的代价是非常昂贵的, 因为jvm和操作系统都需要分配资源.
@@ -290,16 +312,159 @@ java.util.concurrent包为了解决这个问题, 提供了一个带有标记的�
 ② 每一个线程都只是使用ThreadLocal标注变量的副本进行计算, 每一个线程的ThreadLocal变量值都是独立的, 不被其他线程影响.
 
 19. CountDownLatch和CyclicBarrier的用法, 以及相互之间的差别?
+
+
+
 20. LockSupport工具
+
+
+
 21. Condition接口及其实现原理
+
+
+
 22. Fork/Join框架的理解
+
+
+
 23. 分段锁的原理, 锁力度减小的思考
+
+
+
+
 24. 八种阻塞队列以及各个阻塞队列的特性
+
+#### ArrayBlockingQueue: 一个由数组结构组成的有界阻塞队列
+用数组实现的有界阻塞队列。此队列按照先进先出（FIFO）的原则对元素进行排序。默认情况下不保证访问者公平的访问队列，
+所谓公平访问队列是指阻塞的所有生产者线程或消费者线程，当队列可用时，可以按照阻塞的先后顺序访问队列，即先阻塞的
+生产者线程，可以先往队列里插入元素，先阻塞的消费者线程，可以先从队列里获取元素。通常情况下为了保证公平性会降低
+吞吐量。我们可以使用以下代码创建一个公平的阻塞队列：
+ArrayBlockingQueue fairQueue = new  ArrayBlockingQueue(1000,true);
+
+#### LinkedBlockingQueue: 一个由链表结构组成的有界阻塞队列。
+基于链表的阻塞队列，同ArrayListBlockingQueue类似，此队列按照先进先出（FIFO）的原则对元素进行排序，其内部也
+维持着一个数据缓冲队列（该队列由一个链表构成），当生产者往队列中放入一个数据时，队列会从生产者手中获取数据，
+并缓存在队列内部，而生产者立即返回；只有当队列缓冲区达到最大值缓存容量时（LinkedBlockingQueue可以通过构造函
+数指定该值），才会阻塞生产者队列，直到消费者从队列中消费掉一份数据，生产者线程会被唤醒，反之对于消费者这端的
+处理也基于同样的原理。而LinkedBlockingQueue之所以能够高效的处理并发数据，还因为其对于生产者端和消费者端分别
+采用了独立的锁来控制数据同步，这也意味着在高并发的情况下生产者和消费者可以并行地操作队列中的数据，以此来提高
+整个队列的并发性能。 
+作为开发者，我们需要注意的是，如果构造一个LinkedBlockingQueue对象，而没有指定其容量大小，LinkedBlockingQueue
+会默认一个类似无限大小的容量（Integer.MAX_VALUE），这样的话，如果生产者的速度一旦大于消费者的速度，也许还没有
+等到队列满阻塞产生，系统内存就有可能已被消耗殆尽了。 
+ArrayBlockingQueue和LinkedBlockingQueue是两个最普通也是最常用的阻塞队列，一般情况下，在处理多线程间的生产者
+消费者问题，使用这两个类足以。
+
+#### PriorityBlockingQueue: 一个支持优先级排序的无界阻塞队列。
+是一个支持优先级的无界队列。默认情况下元素采取自然顺序升序排列。可以自定义实现compareTo()方法来指定元素进行排
+序规则，或者初始化PriorityBlockingQueue时，指定构造参数Comparator来对元素进行排序。需要注意的是不能保证同
+优先级元素的顺序。
+
+#### DelayQueue: 一个使用优先级队列实现的无界阻塞队列。
+是一个支持延时获取元素的无界阻塞队列。队列使用PriorityQueue来实现。队列中的元素必须实现Delayed接口，在创建元
+素时可以指定多久才能从队列中获取当前元素。只有在延迟期满时才能从队列中提取元素。我们可以将DelayQueue运用在以
+下应用场景：
+
+① 缓存系统的设计：可以用DelayQueue保存缓存元素的有效期，使用一个线程循环查询DelayQueue，一旦能从DelayQueue
+中获取元素时，表示缓存有效期到了。
+② 定时任务调度：使用DelayQueue保存当天将会执行的任务和执行时间，一旦从DelayQueue中获取到任务就开始执行，比如
+TimerQueue就是使用DelayQueue实现的。
+
+#### SynchronousQueue: 一个不存储元素的阻塞队列。
+是一个不存储元素的阻塞队列。每一个put操作必须等待一个take操作，否则不能继续添加元素。SynchronousQueue可以看成
+是一个传球手，负责把生产者线程处理的数据直接传递给消费者线程。队列本身并不存储任何元素，非常适合于传递性场景,比
+如在一个线程中使用的数据，传递给另外一个线程使用，SynchronousQueue的吞吐量高于LinkedBlockingQueue 和 
+ArrayBlockingQueue。
+
+#### LinkedTransferQueue: 一个由链表结构组成的无界阻塞队列。
+是一个由链表结构组成的无界阻塞TransferQueue队列。相对于其他阻塞队列，LinkedTransferQueue多了tryTransfer和transfer
+方法。 
+transfer方法。如果当前有消费者正在等待接收元素（消费者使用take()方法或带时间限制的poll()方法时），transfer方法可以
+把生产者传入的元素立刻transfer（传输）给消费者。如果没有消费者在等待接收元素，transfer方法会将元素存放在队列的tail
+节点，并等到该元素被消费者消费了才返回。transfer方法的关键代码如下：
+① Node pred = tryAppend(s, haveData);
+② return awaitMatch(s, pred, e, (how == TIMED), nanos);
+第一行代码是试图把存放当前元素的s节点作为tail节点。第二行代码是让CPU自旋等待消费者消费元素。因为自旋会消耗CPU，所以
+自旋一定的次数后使用Thread.yield()方法来暂停当前正在执行的线程，并执行其他线程。
+
+tryTransfer方法。则是用来试探下生产者传入的元素是否能直接传给消费者。如果没有消费者等待接收元素，则返回false。
+和transfer方法的区别是tryTransfer方法无论消费者是否接收，方法立即返回。而transfer方法是必须等到消费者消费了才返回。
+
+对于带有时间限制的tryTransfer(E e, long timeout, TimeUnit unit)方法，则是试图把生产者传入的元素直接传给消费者，
+但是如果没有消费者消费该元素则等待指定的时间再返回，如果超时还没消费元素，则返回false，如果在超时时间内消费了元素，
+则返回true。
+
+#### LinkedBlockingDeque: 一个由链表结构组成的双向阻塞队列。
+是一个由链表结构组成的双向阻塞队列。所谓双向队列指的你可以从队列的两端插入和移出元素。双端队列因为多了一个操作队列的入口，
+在多线程同时入队时，也就减少了一半的竞争。相比其他的阻塞队列，LinkedBlockingDeque多了addFirst，addLast，offerFirst，
+offerLast，peekFirst，peekLast等方法，以First单词结尾的方法，表示插入，获取（peek）或移除双端队列的第一个元素。
+以Last单词结尾的方法，表示插入，获取或移除双端队列的最后一个元素。另外插入方法add等同于addLast，移除方法remove等效
+于removeFirst。但是take方法却等同于takeFirst，不知道是不是Jdk的bug，使用时还是用带有First和Last后缀的方法更清楚。
+在初始化LinkedBlockingDeque时可以设置容量防止其过渡膨胀。另外双向阻塞队列可以运用在“工作窃取”模式中。
 
 # Spring
 1. BeanFactory 和 FactoryBean?
+
+#### Bean: Java类实例
+每一个Bean对应Spring容器里的一个Java实例. 
+定义Bean时通常需要指定两个属性。
+① Id：确定该Bean的唯一标识符，容器对Bean管理、访问、以及该Bean的依赖关系，都通过该属性完成。Bean的id属性在Spring
+容器中是唯一的。
+② Class：指定该Bean的具体实现类。注意这里不能使接口。通常情况下，Spring会直接使用new关键字创建该Bean的实例，因此，
+这里必须提供Bean实现类的类名。
+
+#### BeanFactory: 
+BeanFactory是Spring IOC最基本的容器，负责生产和管理bean，它为其他具体的IOC容器实现提供了最基本的规范，例如
+DefaultListableBeanFactory, XmlBeanFactory, ApplicationContext 等具体的容器都是实现了BeanFactory，
+再在其基础之上附加了其他的功能。
+下面可以看看BeanFactory提供的基本功能：
+<code>
+public interface BeanFactory {
+    String FACTORY_BEAN_PREFIX = "&";
+    Object getBean(String name) throws BeansException;
+    <T> T getBean(String name, Class<T> requiredType) throws BeansException;
+    <T> T getBean(Class<T> requiredType) throws BeansException;
+    Object getBean(String name, Object... args) throws BeansException;
+    boolean containsBean(String name);
+    boolean isSingleton(String name) throws NoSuchBeanDefinitionException;
+    boolean isPrototype(String name) throws NoSuchBeanDefinitionException;
+    boolean isTypeMatch(String name, Class<?> targetType) throws NoSuchBeanDefinitionException;
+    Class<?> getType(String name) throws NoSuchBeanDefinitionException;
+    String[] getAliases(String name);
+}
+</code>
+#### FactoryBean:
+FactoryBean是一个接口，当在IOC容器中的Bean实现了FactoryBean接口后，通过getBean(String BeanName)获取到的Bean
+对象并不是FactoryBean的实现类对象，而是这个实现类中的getObject()方法返回的对象。要想获取FactoryBean的实现类，
+就要getBean(&BeanName)，在BeanName之前加上&。
+<code>
+public interface FactoryBean<T> {
+    T getObject() throws Exception;
+    Class<?> getObjectType();
+    boolean isSingleton();
+}
+</code>
+
+#### 区别
+通过以上源码和示例来看，基本上能印证以下结论，也就是二者的区别。
+① BeanFactory是个Factory，也就是 IOC 容器或对象工厂，所有的Bean都是由BeanFactory( 也就是 IOC 容器 ) 来进行管理。
+② FactoryBean是一个能生产或者修饰生成对象的工厂Bean(本质上也是一个bean)，可以在BeanFactory（IOC容器）中被管理，所以
+它并不是一个简单的Bean。当使用容器中factory bean的时候，该容器不会返回factory bean本身，而是返回其生成的对象。要
+想获取FactoryBean的实现类本身，得在getBean(String BeanName)中的BeanName之前加上&,写成getBean(String &BeanName)。
+
 2. Spring IOC 的理解, 其初始化过程?
+
+
+
 3. BeanFactory 和 ApplicationContext?
+
+简单来说ApplicationContext是BeanFactory的拓展.
+ApplicationContext 容器建立BeanFactory之上，拥有BeanFactory的所有功能，但在实现上会有所差别。我认为差别主要体现在两个方面：
+1.bean的生成方式；2.扩展了BeanFactory的功能，提供了更多企业级功能的支持。
+
+
+
+
 4. Spring Bean 的生命周期, 如何被管理的?
 5. Spring Bean 的加载过程是怎样的?
 6. 如果要你实现Spring AOP, 请问怎么实现?
@@ -355,6 +520,32 @@ java.util.concurrent包为了解决这个问题, 提供了一个带有标记的�
 
 # 缓存
 1. Redis用过哪些数据结构, 以及Redis底层是怎么实现的?
+
+String 字符串
+Redis中字符串是由redis自己构建的一种名为简单动态字符串(simple dynamic string, SDS)的抽象类型来表示的,
+并将SDS用作Redis的默认字符串表示.
+<code>
+struct sdshdr { 
+    // 记录buf数组中已使用字节的数量
+    // 等于SDS中所保存字符串的长度
+    int len;
+
+    // 记录buf数组中未使用字节的数量
+    int free;
+
+    // 字节数组, 用于保存字符串
+    char buf[];
+}
+</code>
+
+List 列表
+Hash 哈希表
+Set 集合
+SortedSet 有序集合
+
+
+
+
 2. Redis缓存穿透, 缓存雪崩
 3. 如何使用Redis来实现分布式锁?
 4. Redis的并发竞争问题是如何解决的?
@@ -372,8 +563,13 @@ java.util.concurrent包为了解决这个问题, 提供了一个带有标记的�
 5. JVM出现fullGC很频繁, 怎么去线上排查问题?
 6. 类加载为什么要使用双亲委派模式, 有没有什么场景是打破了这个模式?
 7. 类的实例化顺序
-8. JVM垃圾回收机制, 何时出发MinorGC等操作
+8. JVM垃圾回收机制, 何时触发MinorGC等操作
 9. JVM中一次完整的GC流程(从 ygc 到 fgc)是怎么样的
 10. 各种回收器, 各自优缺点, 重点CMS, G1
 11. 各种回收算法
+
+标记清除
+
+
+
 12. OOM错误, stackoverflow错误, permgen space错误
