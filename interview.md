@@ -1,22 +1,64 @@
 # java基础
-1. List和Set的区别
+## 1. List和Set的区别
 
 List和Set都继承了Collection
 Set是最简单的一种集合, 集合中的对象不按特定的方式排序, 并且没有重复的对象.
 List的特征是其元素以线性方式存储, 集合中可以存放重复对象.
 
-2. HashSet是如何保证不重复的?
+## 2. HashSet是如何保证不重复的?
 
 在调用HashSet中的add方法时, 实际是在调用 HashMap的put方法, 像hashmap中添加key.
 HashMap在put一个key时会判断将要放进去的key的hash值和对象地址或者内容是否一样,
 则判断出来要添加的Key与HashMap中的Key重复, 把Value的值给替换成最新的.
 当然HashSet中的Value是一个固定值PRESENT. 所以修改不修改无所谓.
 
-3. HashMap是线程安全的吗, 为什么不是线程安全的(最好画图说明多线程环境下不安全)
+## 3. HashMap是线程安全的吗, 为什么不是线程安全的(最好画图说明多线程环境下不安全)
 
-不是线程安全的, JDK 1.7 中resize会导致
+不是线程安全的.
 
-4. HashMap的扩容过程
+![put方法](put.png)
+
+① put的时候导致的多线程数据不一致。
+这个问题比较好想象，比如有两个线程A和B，首先A希望插入一个key-value对到HashMap中，首先计算记录所要
+落到的桶的索引坐标，然后获取到该桶里面的链表头结点，此时线程A的时间片用完了，而此时线程B被调度得以
+执行，和线程A一样执行，只不过线程B成功将记录插到了桶里面，假设线程A插入的记录计算出来的桶索引和线程
+B要插入的记录计算出来的桶索引是一样的，那么当线程B成功插入之后，线程A再次被调度运行时，它依然持有过
+期的链表头但是它对此一无所知，以至于它认为它应该这样做，如此一来就覆盖了线程B插入的记录，这样线程B插
+入的记录就凭空消失了，造成了数据不一致的行为。
+
+② 另外一个比较明显的线程不安全的问题是HashMap的get操作可能因为resize而引起死循环（cpu100%），具体分析如下：
+下面的代码是resize的核心内容：
+<code>
+void transfer(Entry[] newTable, boolean rehash) {
+    int newCapacity = newTable.length;
+    for (Entry<K,V> e : table) {
+        while(null != e) {
+            Entry<K,V> next = e.next;
+            if (rehash) {
+                e.hash = null == e.key ? 0 : hash(e.key);
+            }
+            int i = indexFor(e.hash, newCapacity);
+            e.next = newTable[i];
+            newTable[i] = e;
+            e = next;
+        }
+    }
+}
+</code>
+这个方法的功能是将原来的记录重新计算在新桶的位置，然后迁移过去。
+
+![多线程HashMap的resize](resize.png)
+
+我们假设有两个线程同时需要执行resize操作，我们原来的桶数量为2，记录数为3，需要resize桶到4，原来的记录分别为：
+[3,A],[7,B],[5,C]，在原来的map里面，我们发现这三个entry都落到了第二个桶里面。
+假设线程thread1执行到了transfer方法的Entry next = e.next这一句，然后时间片用完了，此时的e = [3,A], next = [7,B]。
+线程thread2被调度执行并且顺利完成了resize操作，需要注意的是，此时的[7,B]的next为[3,A]。此时线程thread1重新被调度运行，
+此时的thread1持有的引用是已经被thread2 resize之后的结果。线程thread1首先将[3,A]迁移到新的数组上，然后再处理[7,B]，
+而[7,B]被链接到了[3,A]的后面，处理完[7,B]之后，就需要处理[7,B]的next了啊，而通过thread2的resize之后，[7,B]的next
+变为了[3,A]，此时，[3,A]和[7,B]形成了环形链表，在get的时候，如果get的key的桶索引和[3,A]和[7,B]一样，那么就会陷入死循
+环。
+
+## 4. HashMap的扩容过程
 
 首先要了解HashMap的扩容过程, 我们就得了解一些HashMap中的变量：
 ① Node<K,V>：链表节点, 包含了key、value、hash、next指针四个元素
@@ -72,7 +114,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent, boolean evict) {
 </code>
 又由于table的大小一直是2的倍数, 2的N次方, 因此当前元素插入table的索引的值为其hash值的后N位组成的值
 
-5. HashMap 1.7 与 1.8 的区别, 说明1.8做了哪些优化, 如何优化的?
+## 5. HashMap 1.7 与 1.8 的区别, 说明1.8做了哪些优化, 如何优化的?
 
 在JDK7中, HashMap 的结构都是这么简单, 基于一个数组以及多个链表的实现,
 hash值冲突的时候, 就将对应节点以链表的形式存储. 这样子 HashMap 性能上
@@ -83,7 +125,7 @@ hash值冲突的时候, 就将对应节点以链表的形式存储. 这样子 Ha
 时候, 这个链表就将转换成红黑树.
 JDK8中, 当某个 hash 值的节点数不小于8时, 将不再以链表的形式存储, 会被调整成一颗红黑树.
 
-6. final finally finalize
+## 6. final finally finalize
 
 final 用于修饰类, 成员变量和成员方法. final 修饰的类, 不能被继承, 其中所有的方法都不能被重写, 所以不能同时用 abstract 和 
 final 修饰类. final 修饰的方法不能被重写, 但是子类可以用父类中 final 修饰的方法. final 修饰的成员变量是不可变的, 如果成员
@@ -96,7 +138,7 @@ finalize是 Object 类中的一个方法, 子类可以重写 finalize()方法实
 资源回收是由程序员完成. java虚拟机在垃圾回收之前会先调用垃圾对象的 finalize 方法用于使对象释放资源, 自后才进行垃圾回收, 这个
 方法一般不会显示的调用, 在垃圾回收时垃圾回收器会主动调用.
 
-7. 强引用, 软引用, 弱引用, 虚引用
+## 7. 强引用, 软引用, 弱引用, 虚引用
 
 强引用: 只要引用存在, 垃圾回收器永远不会回收
 Object obj = new Object(); // 可直接通过 obj 取得对应的对象如 obj.equals(new Object());
@@ -131,11 +173,11 @@ pf.isEnQueued();//返回是否从内存中已经删除
 虚引用是每次垃圾回收的时候都会被回收, 通过虚引用的get方法永远获取到的数据为null, 因此也被成为幽灵引用。
 虚引用主要用于检测对象是否已经从内存中删除。
 
-8. java反射
+## 8. java反射
 
 
 
-9. Arrays.sort的实现原理和Collection实现原理
+## 9. Arrays.sort的实现原理和Collection实现原理
 
 Arrays.sort
 数组长度 N < 47 时, 使用插入排序算法
@@ -158,19 +200,19 @@ run。合并的结果保存到栈中。合并直到消耗掉所有的 run，这�
 
 
 
-10. LinkedHashMap的应用
+## 10. LinkedHashMap的应用
 
 
 
-11. cloneable接口实现原理
+## 11. cloneable接口实现原理
 
 
 
-12. 异常分类以及处理机制
+## 12. 异常分类以及处理机制
 
 
 
-13. wait和sleep的区别
+## 13. wait和sleep的区别
 
 #### sleep()
 sleep()使当前线程进入停滞状态（阻塞当前线程）, 让出CUP的使用、目的是不让当前线程独自霸占该进程所获的CPU资源,
@@ -189,12 +231,13 @@ wiat()必须放在synchronized block中，否则会在program runtime时扔出"j
 　　　　sleep()睡眠时，保持对象锁，仍然占有该锁；
 　　　　而wait()睡眠时，释放对象锁。
 
-14. 数组在内存中如何分配
+## 14. 数组在内存中如何分配
 
 Java中数组存储两类事物: 基本数据类型或者引用(对象指针).
 当一个对象通过new 创建, 那么将在堆内存中分配一段空间, 并返回其引用(指针).
 对于数组也是同样的方式.
 Java中的数组,也是对象(继承Object),因此数组所在的区域和对象是一样的.
+
 <code>
 class A {
     int x;
@@ -208,6 +251,7 @@ public void m2() {
     A a = new A();
 }
 </code>
+
 上面的代码片段中,让我们执行 m1()方法看看发生了什么:
     ① 当 m1 被调用时,一个新的栈帧(Frame-1)被压入JVM栈中,当然,相关的局部变量也在 Frame-1中创建, 比如 i;
     ② 然后 m1调用m2,,又有一个新的栈帧(Frame-2)被压入到JVM栈中;
@@ -216,27 +260,27 @@ public void m2() {
     ![内存图示](stack.png)
 
 # java并发
-1. synchronized的实现原理以及锁优化
+## 1. synchronized的实现原理以及锁优化
 
 
 
-2. volatile的实现原理是
+## 2. volatile的实现原理是
 
 
 
-3. java信号灯
+## 3. java信号灯
 
 
 
-4. synchronized在静态方法和普通方法的区别
+## 4. synchronized在静态方法和普通方法的区别
 
 
 
-5. 怎么实现所有线程在等待某个时间的发生才会去执行?
+## 5. 怎么实现所有线程在等待某个时间的发生才会去执行?
 
 
 
-6. CAS? CAS有什么缺陷? 如何解决?
+## 6. CAS? CAS有什么缺陷? 如何解决?
 
 Compare and Swap. 比较并交换
 CAS存在一个逻辑漏洞: 如果一个变量V初次读取的时候是A值, 并且在准备赋值的时候检查到它仍然为A值, 那我们就能说它的值
@@ -245,48 +289,48 @@ CAS存在一个逻辑漏洞: 如果一个变量V初次读取的时候是A值, �
 java.util.concurrent包为了解决这个问题, 提供了一个带有标记的原子引用类 "AtomicStampedReference", 它可以通过控制
 变量值的版本来保证CAS的正确性. 或者使用 传统的互斥同步.
 
-7. synchronized和lock有什么区别?
+## 7. synchronized和lock有什么区别?
 
 
 
-8. HashTable是怎么加锁的?
+## 8. HashTable是怎么加锁的?
 
 
 
-9. HashMap的并发问题?
+## 9. HashMap的并发问题?
 
 
 
-10. ConcurrentHashMap介绍? 1.8中为什么要用红黑树?
+## 10. ConcurrentHashMap介绍? 1.8中为什么要用红黑树?
 
 红黑树:
 降低查找同hash值的对象时的时间复杂度, 链表 => 链表/红黑树.
 
-11. AQS
+## 11. AQS
 
 
 
-12. 如何检测死锁? 怎么预防死锁?
+## 12. 如何检测死锁? 怎么预防死锁?
 
 
 
-13. java内存模型
+## 13. java内存模型
 
 
 
-14. 如何保证多线程下i++结果正确
+## 14. 如何保证多线程下i++结果正确
 
 
 
-15. 线程池的种类, 区别和使用场景
+## 15. 线程池的种类, 区别和使用场景
 
 
 
-16. 分析线程池的实现原理和线程的调度过程?
+## 16. 分析线程池的实现原理和线程的调度过程?
 
 
 
-17. 线程池如何调优, 最大数目如何确认?
+## 17. 线程池如何调优, 最大数目如何确认?
 
 创建线程及后续的销毁过程的代价是非常昂贵的, 因为jvm和操作系统都需要分配资源.
 如果手动创建线程, 如果不进行适当管理, 很可能引发灾难性后果.
@@ -301,7 +345,7 @@ java.util.concurrent包为了解决这个问题, 提供了一个带有标记的�
 
 
 
-18. ThreadLocal原理, 用的时候需要注意什么?
+## 18. ThreadLocal原理, 用的时候需要注意什么?
 
 每一个线程的Thread对象都有一个ThreadLocalMap对象, 这个对象存储了一组以ThreadLocal.ThreadLocalHashCode为键, 以
 本地线程变量为值的 K-V 值对, ThreadLocal对象就是当前线程的 ThreadLocalMap的访问入口, 每一个ThreadLocal对象都包含
@@ -311,28 +355,28 @@ java.util.concurrent包为了解决这个问题, 提供了一个带有标记的�
 ① 初始化时, 使用initValue方法
 ② 每一个线程都只是使用ThreadLocal标注变量的副本进行计算, 每一个线程的ThreadLocal变量值都是独立的, 不被其他线程影响.
 
-19. CountDownLatch和CyclicBarrier的用法, 以及相互之间的差别?
+## 19. CountDownLatch和CyclicBarrier的用法, 以及相互之间的差别?
 
 
 
-20. LockSupport工具
+## 20. LockSupport工具
 
 
 
-21. Condition接口及其实现原理
+## 21. Condition接口及其实现原理
 
 
 
-22. Fork/Join框架的理解
+## 22. Fork/Join框架的理解
 
 
 
-23. 分段锁的原理, 锁力度减小的思考
+## 23. 分段锁的原理, 锁力度减小的思考
 
 
 
 
-24. 八种阻塞队列以及各个阻塞队列的特性
+## 24. 八种阻塞队列以及各个阻塞队列的特性
 
 #### ArrayBlockingQueue: 一个由数组结构组成的有界阻塞队列
 用数组实现的有界阻塞队列。此队列按照先进先出（FIFO）的原则对元素进行排序。默认情况下不保证访问者公平的访问队列，
@@ -403,7 +447,7 @@ offerLast，peekFirst，peekLast等方法，以First单词结尾的方法，表�
 在初始化LinkedBlockingDeque时可以设置容量防止其过渡膨胀。另外双向阻塞队列可以运用在“工作窃取”模式中。
 
 # Spring
-1. BeanFactory 和 FactoryBean?
+## 1. BeanFactory 和 FactoryBean?
 
 #### Bean: Java类实例
 每一个Bean对应Spring容器里的一个Java实例. 
@@ -452,11 +496,11 @@ public interface FactoryBean<T> {
 它并不是一个简单的Bean。当使用容器中factory bean的时候，该容器不会返回factory bean本身，而是返回其生成的对象。要
 想获取FactoryBean的实现类本身，得在getBean(String BeanName)中的BeanName之前加上&,写成getBean(String &BeanName)。
 
-2. Spring IOC 的理解, 其初始化过程?
+## 2. Spring IOC 的理解, 其初始化过程?
 
 
 
-3. BeanFactory 和 ApplicationContext?
+## 3. BeanFactory 和 ApplicationContext?
 
 简单来说ApplicationContext是BeanFactory的拓展.
 ApplicationContext 容器建立BeanFactory之上，拥有BeanFactory的所有功能，但在实现上会有所差别。我认为差别主要体现在两个方面：
@@ -465,63 +509,63 @@ ApplicationContext 容器建立BeanFactory之上，拥有BeanFactory的所有功
 
 
 
-4. Spring Bean 的生命周期, 如何被管理的?
-5. Spring Bean 的加载过程是怎样的?
-6. 如果要你实现Spring AOP, 请问怎么实现?
-7. 如果要你实现Spring IOC, 你会注意哪些问题?
-8. Spring是如何管理事务的, 事务管理机制?
-9. Spring的不同事务传播行为有哪些, 干什么用的?
-10. Spring中用到了哪些设计模式?
-11. Spring MVC 的工作原理?
-12. Spring 的循环注入的原理?
-13. Spring AOP 的理解, 各个术语, 他们是怎么相互工作的?
-14. Spring 如何保证Controller并发的安全?
+## 4. Spring Bean 的生命周期, 如何被管理的?
+## 5. Spring Bean 的加载过程是怎样的?
+## 6. 如果要你实现Spring AOP, 请问怎么实现?
+## 7. 如果要你实现Spring IOC, 你会注意哪些问题?
+## 8. Spring是如何管理事务的, 事务管理机制?
+## 9. Spring的不同事务传播行为有哪些, 干什么用的?
+## 10. Spring中用到了哪些设计模式?
+## 11. Spring MVC 的工作原理?
+## 12. Spring 的循环注入的原理?
+## 13. Spring AOP 的理解, 各个术语, 他们是怎么相互工作的?
+## 14. Spring 如何保证Controller并发的安全?
 
 # Netty
-1. BIO, NIO和AIO
-2. Netty的各大组件?
-3. Netty的线程模型?
-4. TCP 粘包/拆包的原因及解决方法
-5. 了解哪几种序列化协议? 包括使用场景和如何去选择
-6. Netty的零拷贝实现
-7. Netty的高性能体现在哪些方面?
+## 1. BIO, NIO和AIO
+## 2. Netty的各大组件?
+## 3. Netty的线程模型?
+## 4. TCP 粘包/拆包的原因及解决方法
+## 5. 了解哪几种序列化协议? 包括使用场景和如何去选择
+## 6. Netty的零拷贝实现
+## 7. Netty的高性能体现在哪些方面?
 
 # 分布式相关
-1. Dubbo的底层实现原理和机制
-2. 描述一个服务从发布到被消费的详细过程
-3. 分布式系统怎么服务治理
-4. 接口幂等性的概念
-5. 消息中间件如何解决消息丢失的问题
-6. Dubbo的服务请求失败怎么处理
-7. 重连机制会不会造成错误
-8. 对分布式事务的理解
-9. 如何实现负载均衡? 有哪些算法可以实现?
-10. Zookeeper的用途, 选举的原理是什么?
-11. 数据的垂直拆分和水平拆分
-12. Zookeeper的原理和适用场景
-13. Zookeeper watch机制
-14. redis/zk节点宕机如何处理
-15. 分布式集群下如何做到唯一序列号
-16. 如何做一个分布式锁
-17. 用过哪些MQ, 怎么用的, 和其他MQ比较有什么优缺点, MQ的连接是线程安全的吗?
-18. MQ系统的数据如何保证不丢失?
-19. 列举出你能想到的数据库分库分表策略, 分库分表后, 如何解决全表查询问题
-20. Zookeeper的选举策略
-21. 全局ID
+## 1. Dubbo的底层实现原理和机制
+## 2. 描述一个服务从发布到被消费的详细过程
+## 3. 分布式系统怎么服务治理
+## 4. 接口幂等性的概念
+## 5. 消息中间件如何解决消息丢失的问题
+## 6. Dubbo的服务请求失败怎么处理
+## 7. 重连机制会不会造成错误
+## 8. 对分布式事务的理解
+## 9. 如何实现负载均衡? 有哪些算法可以实现?
+## 10. Zookeeper的用途, 选举的原理是什么?
+## 11. 数据的垂直拆分和水平拆分
+## 12. Zookeeper的原理和适用场景
+## 13. Zookeeper watch机制
+## 14. redis/zk节点宕机如何处理
+## 15. 分布式集群下如何做到唯一序列号
+## 16. 如何做一个分布式锁
+## 17. 用过哪些MQ, 怎么用的, 和其他MQ比较有什么优缺点, MQ的连接是线程安全的吗?
+## 18. MQ系统的数据如何保证不丢失?
+## 19. 列举出你能想到的数据库分库分表策略, 分库分表后, 如何解决全表查询问题
+## 20. Zookeeper的选举策略
+## 21. 全局ID
 
 # 数据库
-1. MySql分页有哪些优化?
-2. 悲观锁, 乐观锁
-3. 组合索引, 最左原则
-4. mysql的表锁, 行锁
-5. mysql性能优化
-6. mysql的索引分类: B+, hash; 什么情况下用什么索引?
-7. 事务的特性和隔离级别
+## 1. MySql分页有哪些优化?
+## 2. 悲观锁, 乐观锁
+## 3. 组合索引, 最左原则
+## 4. mysql的表锁, 行锁
+## 5. mysql性能优化
+## 6. mysql的索引分类: B+, hash; 什么情况下用什么索引?
+## 7. 事务的特性和隔离级别
 
 # 缓存
-1. Redis用过哪些数据结构, 以及Redis底层是怎么实现的?
+## 1. Redis用过哪些数据结构, 以及Redis底层是怎么实现的?
 
-String 字符串
+#### String 字符串
 Redis中字符串是由redis自己构建的一种名为简单动态字符串(simple dynamic string, SDS)的抽象类型来表示的,
 并将SDS用作Redis的默认字符串表示.
 <code>
@@ -538,38 +582,53 @@ struct sdshdr {
 }
 </code>
 
-List 列表
-Hash 哈希表
-Set 集合
-SortedSet 有序集合
+#### List 列表
+redis 构建了自己的链表实现
+typedef struct listNode {
+    // 前置节点
+    struct listNode * prev;
+
+    // 后置节点
+    struct listNode * next;
+
+    // 节点的值
+    void * value;
+} listNode
+Redis里的链表并没有什么特别需要说明的地方，和其他语言中的链表类似，定义了链表节点listNode结构，包含
+prev(listNode)属性，next(listNode)属性，value属性的结构，同时使用list来持有链表，list的结构包含
+head(listNode)属性，tail(listNode)属性，len(long)属性，还有一些方法，如复制，释放，对比函数
+
+#### Hash 哈希表
+#### Set 集合
+#### SortedSet 有序集合
 
 
 
 
-2. Redis缓存穿透, 缓存雪崩
-3. 如何使用Redis来实现分布式锁?
-4. Redis的并发竞争问题是如何解决的?
-5. Redis的持久化的几种方式, 优缺点是什么, 是怎么实现的?
-6. Redis的缓存失效策略
-7. Redis的集群, 高可用, 原理
-8. Redis缓存分片
-9. Redis的数据淘汰策略
+## 2. Redis缓存穿透, 缓存雪崩
+## 3. 如何使用Redis来实现分布式锁?
+## 4. Redis的并发竞争问题是如何解决的?
+## 5. Redis的持久化的几种方式, 优缺点是什么, 是怎么实现的?
+## 6. Redis的缓存失效策略
+## 7. Redis的集群, 高可用, 原理
+## 8. Redis缓存分片
+## 9. Redis的数据淘汰策略
 
 # JVM
-1. 详细jvm内存模型
-2. 讲讲什么情况下会出内存溢出, 内存泄漏?
-3. 说说java线程栈
-4. JVM年轻代到老年代的晋升过程的判断条件是什么?
-5. JVM出现fullGC很频繁, 怎么去线上排查问题?
-6. 类加载为什么要使用双亲委派模式, 有没有什么场景是打破了这个模式?
-7. 类的实例化顺序
-8. JVM垃圾回收机制, 何时触发MinorGC等操作
-9. JVM中一次完整的GC流程(从 ygc 到 fgc)是怎么样的
-10. 各种回收器, 各自优缺点, 重点CMS, G1
-11. 各种回收算法
+## 1. 详细jvm内存模型
+## 2. 讲讲什么情况下会出内存溢出, 内存泄漏?
+## 3. 说说java线程栈
+## 4. JVM年轻代到老年代的晋升过程的判断条件是什么?
+## 5. JVM出现fullGC很频繁, 怎么去线上排查问题?
+## 6. 类加载为什么要使用双亲委派模式, 有没有什么场景是打破了这个模式?
+## 7. 类的实例化顺序
+## 8. JVM垃圾回收机制, 何时触发MinorGC等操作
+## 9. JVM中一次完整的GC流程(从 ygc 到 fgc)是怎么样的
+## 10. 各种回收器, 各自优缺点, 重点CMS, G1
+## 11. 各种回收算法
 
 标记清除
 
 
 
-12. OOM错误, stackoverflow错误, permgen space错误
+## 12. OOM错误, stackoverflow错误, permgen space错误
