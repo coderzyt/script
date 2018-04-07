@@ -699,6 +699,35 @@ CMS是一种以获取最短回收停顿时间为目标的收集器, 这使得它
 ⑦ UseFullGCsBeforeCompaction：设定进行多少次 CMS 垃圾回收后，进行一次内存压缩。
 #### 一些建议
 对于Native Memory:
+① 使用了 NIO 或者 NIO 框架( Mina/Netty)
+② 使用了 DirectByteBuffer 分配字节缓冲区
+③ 使用了 MappedByteBuffer 做内存映射
+④ 由于 Native Memory 只能通过 Full GC 回收, 所以除非你非常清楚这时真的有必要, 否则不要轻易调用 System.gc()
+另外为了防止某些狂阶的 System.gc()调用(例如 NIO 框架, Java RMI), 建议在启动参数中加上 -XX:+DisableExplicitGC来禁用显示 GC. 这个参数有个巨大的坑, 如果你禁用了 System.gc(), 那么上面的3种场景下的内存就无法回收, 可能造成 OOM, 如果你使用了 CMS GC, 那么可以用这个参数替代: -XX:+ExplicitGCInvokesConcurrent.
+此外除了 CMS 的 GC, 其实其他针对 old gen 的回收器都会在对 old gen 回收的同时使用 young gc.
+
+### G1收集器
+G1收集器是一款面向服务端应用的垃圾收集器. HotSpot 团队赋予它的使命是在未来替换掉 jdk1.5中发布的 CMS 收集器. 与其他 GC 收集器相比, G1具备如下特点:
+① 并行和并发: G1能更充分的利用 GPU, 多核环境下的硬件优势来缩短 stop the world 的停顿时间.
+② 分代收集: 和其他收集器一样, 分代的概念在 G1中依然存在, 不过 G1不需要其他的垃圾回收器的配合就可以独自管理整个 GC 堆.
+③ 空间整合: G1收集器有利于程序长时间运行, 分配大对象时不会无法得到连续的空间而提前触发一次 Full GC.
+可预测的非停顿: 这是 G1相比于 CMS 的另一大优势, 降低停顿时间是 G1和 CMS 共同的关注点, 能让使用者明确指定在一个长度为 M 毫秒的时间片段内, 消耗在垃圾收集上的时间不得超过 N 毫秒.
+④ 在使用 G1收集器时, Java 堆得内存布局和其他收集器有很大的差别, 它将这个 Java 堆分为多个大小相等的独立区域, 虽然还保留新生代和老年代的概念, 但是新生代和老年代不再试物理隔离的了, 他们都是一部分 Region( 不需要连续)的集合.
+虽然 G1看起来有很多优点, 实际上 CMS 还是主流.
+
+#### 与 GC 相关的常用参数
+除了上面提及的一些参数，下面补充一些和GC相关的常用参数：
+Xmx: 设置堆内存的最大值。
+Xms: 设置堆内存的初始值。
+Xmn: 设置新生代的大小。
+Xss: 设置栈的大小。
+PretenureSizeThreshold: 直接晋升到老年代的对象大小，设置这个参数后，大于这个参数的对象将直接在老年代分配。
+MaxTenuringThrehold: 晋升到老年代的对象年龄。每个对象在坚持过一次Minor GC之后，年龄就会加1，当超过这个参数值时就进入老年代。
+UseAdaptiveSizePolicy: 在这种模式下，新生代的大小、eden 和 survivor 的比例、晋升老年代的对象年龄等参数会被自动调整，以达到在堆大小、吞吐量和停顿时间之间的平衡点。在手工调优比较困难的场合，可以直接使用这种自适应的方式，仅指定虚拟机的最大堆、目标的吞吐量 (GCTimeRatio) 和停顿时间 (MaxGCPauseMills)，让虚拟机自己完成调优工作。
+SurvivorRattio: 新生代Eden区域与Survivor区域的容量比值，默认为8，代表Eden: Suvivor= 8: 1。
+XX:ParallelGCThreads：设置用于垃圾回收的线程数。通常情况下可以和 CPU 数量相等。但在 CPU 数量比较多的情况下，设置相对较小的数值也是合理的。
+XX:MaxGCPauseMills：设置最大垃圾收集停顿时间。它的值是一个大于 0 的整数。收集器在工作时，会调整 Java 堆大小或者其他一些参数，尽可能地把停顿时间控制在 MaxGCPauseMills 以内。
+XX:GCTimeRatio:设置吞吐量大小，它的值是一个 0-100 之间的整数。假设 GCTimeRatio 的值为 n，那么系统将花费不超过 1/(1+n) 的时间用于垃圾收集。
 
 
 ## 11. 各种回收算法
