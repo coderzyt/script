@@ -165,11 +165,13 @@ wf.isEnQueued();//返回是否被垃圾回收器标记为即将回收的垃圾
 
 虚引用：
 垃圾回收时回收, 无法通过引用取到对象值, 可以通过如下代码实现
+<code>
 Object obj = new Object();
 PhantomReference<Object> pf = new PhantomReference<Object>(obj);
 obj=null;
 pf.get();//永远返回null
 pf.isEnQueued();//返回是否从内存中已经删除
+</code>
 虚引用是每次垃圾回收的时候都会被回收, 通过虚引用的get方法永远获取到的数据为null, 因此也被成为幽灵引用。
 虚引用主要用于检测对象是否已经从内存中删除。
 
@@ -687,7 +689,7 @@ CMS是一种以获取最短回收停顿时间为目标的收集器, 这使得它
 ③ 重新标记
 ④ 并发清除
 注意初始标记和重新标记还是会stop the world, 但是在好费时间更改的并发标记和并发清除两个阶段都可以和用户进程同时工作.
-不过由于CMS收集器是基于标记清除算法实现的, 会导致有大量的空间碎片产生, 在为大对象分配内存的时候, 往往会出现老年代还有很大的空间剩余, 但是无法找到足够大的连续空间来分配对象, 不得不提前开启一次Full GC. 为了解决这个问题, CMS收集器默认提供了一个 -XX:+UseCMSCompactAtFullCollection 收集开关参数(默认是开启的), 用于在CMS收集器进行Full GC后开启内存碎片的合并整理过程, 内存整理的过程是无法并发的, 这样内存碎片问题倒是没有了, 不过停顿时间不得不边长. 虚拟机设计者还提供了另外一个参数 -XX:CMSFullGCsBeforeCompaction 参数用于设置执行多少次不压缩的Full GC后跟着来一次带压缩的(默认值是0, 表示每次进入Full GC时都进行碎片整理).
+不过由于CMS收集器是基于标记清除算法实现的, 会导致有大量的空间碎片产生, 在为大对象分配内存的时候, 往往会出现老年代还有很大的空间剩余, 但是无法找到足够大的`连续空间来分配对象, 不得不提前开启一次Full GC. 为了解决这个问题, CMS收集器默认提供了一个 -XX:+UseCMSCompactAtFullCollection 收集开关参数(默认是开启的), 用于在CMS收集器进行Full GC后开启内存碎片的合并整理过程, 内存整理的过程是无法并发的, 这样内存碎片问题倒是没有了, 不过停顿时间不得不边长. 虚拟机设计者还提供了另外一个参数 -XX:CMSFullGCsBeforeCompaction 参数用于设置执行多少次不压缩的Full GC后跟着来一次带压缩的(默认值是0, 表示每次进入Full GC时都进行碎片整理).
 不幸的是, 它作为老年代的收集器, 却无法与jdk1.4中已经存在的新生代手气Parallel Scanvenge配合工作, 所以在jdk1.5中使用cms来收集老年代的时候, 新生代只能选择ParNew或Serial收集器中的一个. ParNew收集器是使用 -XX: +UseConcMarkSweepGC选项启用CMS收集器之后的默认新生代收集器, 也可以使用 -XX:+UseParNewGC选项来强制指定它.
 由于CMS收集器现在比较常用，下面我们再额外了解一下CMS算法的几个常用参数：
 ① UseCMSInitatingOccupancyOnly：表示只在到达阈值的时候，才进行 CMS 回收。
