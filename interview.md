@@ -595,14 +595,51 @@ reader本身现了配置文字 到bean对象的转换过程。当然我们自己
 
 
 ## 3. BeanFactory 和 ApplicationContext?
-
 简单来说ApplicationContext是BeanFactory的拓展.
 ApplicationContext 容器建立BeanFactory之上，拥有BeanFactory的所有功能，但在实现上会有所差别。我认为差别主要体现在两个方面：
 ① bean的生成方式；
 ② 扩展了BeanFactory的功能，提供了更多企业级功能的支持。
-
 ## 4. Spring Bean 的生命周期, 如何被管理的?
+对于普通的 java 对象, 当 new 的时候创建对象, 当它没有任何引用的时候被垃圾回收机制回收. 而由 Spring IOC 容器托管的对象, 他们的生命周期完全有容器控制. Spring 中每个 Bean 的生命周期如下:
+![bean 的生命周期](bean生命周期.jpg)
+### 实例化 Bean
+对于 BeanFactory 容器, 当客户端请求一个尚未初始化的 bean 时, 或初始化 bean 的时候需要注入另一个尚未初始化的依赖时, 容器就会调用 createBean进行实例化.
+对于 ApplicationContext 容器, 容器启动结束后, 便实例化所有的 bean.
+容器通过获取 BeanDefinition 对象中的信息进行实例化. 并且这一步仅仅是简单的实例化, 并未进行依赖注入.
+实例化对象被包装在 BeanWrapper 对象中, BeanWrapper 提供了设置对象属性的接口, 从而避免了使用反射机制设置属性.
+### 设置对象属性
+实例化后的对象被封装在 BeanWrapper 对象中, 并且此时对象仍然是一个原生的状态, 并没有进行依赖注入.
+紧接着, Spring 根据 BeanDefinition 中的信息进行依赖注入.
+并且通过 BeanWrapper 提供的设置属性的接口完成依赖注入.
+### 注入 Aware 接口
+紧接着, Spring 会检测该对象是否实现了 xxxAware 接口, 并将相关的 xxxAware 实例注入给 bean.
+### BeanPostProcessor
+当经过上述的几个步骤后, bean对象已经被正确构造, 但如果你想要对象被使用前再进行一些自定义的处理, 就可以通过 BeanPostProcessor 接口实现.
+该接口提供了两个函数:
+postProcessBeforeInitialization(Object bean, String beanName)
+当前正在初始化的 bean 对象会被传递进来, 我们就可以对这个 bean 做任何处理. 这个函数会先于 InitializationBean 执行, 因此成为前置处理. 所有 Aware 接口的注入就是在这一步完成的.
+postProcessAfterInitialization(Object bean, String beanName)
+当前正在初始化的 bean 对象会被传递进来, 我们就可以对这个 bean 作任何处理, 这个函数会在 InitializationBean 完成后执行, 因此称为后置处理.
+### InitializingBean与 init-method
+当 BeanPostProcessor 的前置处理完成后就会进入本阶段
+InitializingBean 接口只有一个函数:
+afterPropertiesSet()
+这一阶段也可以在 bean 正式构造完成前增加我们自定义的逻辑, 但他与前置处理不同, 由于该函数并不会把当前 bean 对象传进来, 因此在这一步没办法处理对象本身, 只能增加一些额外的逻辑. 若要使用它, 我们需要让 bean 实现该接口, 并把要增加的逻辑写在该函数中. 然后 spring 会在前置处理完成后检测当前 bean 是否实现了该接口, 并执行 afterPropertiesSet 函数.
+当然 Spring 为了降低对客户代码的侵入性, 给 bean 的配置提供了 init-method 的属性, 该属性指定了在这一阶段需要执行的函数名, Spring 便会在初始化阶段执行我们设置的函数. init-method 本质上仍然使用了 InitializingBean 接口.
+### DisposableBean 和 destroy-method
+和 init-method 一样, 通过给 destroy-method 指定函数, 就可以在 bean 销毁前执行指定的逻辑.
+
 ## 5. Spring Bean 的加载过程是怎样的?
+先从表面上可以看到 bean 的加载可大致分为:
+从 xml 读取 bean 的信息加载到 spring 容器中, 通过 xml 配置的 id 从 Spring 容器反射得到这个类的实例对象.
+
+获取配置文件资源
+对获取的 xml 文件资源进行一定的处理检验
+处理包装资源
+解析处理包装过后的资源
+加载提取 bean 并注册(添加到 beanDefinitionMap 中)
+
+获取 bean, 从 beanDefinitionMap 中获取
 ## 6. 如果要你实现Spring AOP, 请问怎么实现?
 ## 7. 如果要你实现Spring IOC, 你会注意哪些问题?
 ## 8. Spring是如何管理事务的, 事务管理机制?
@@ -656,7 +693,6 @@ ApplicationContext 容器建立BeanFactory之上，拥有BeanFactory的所有功
 
 # 缓存
 ## 1. Redis用过哪些数据结构, 以及Redis底层是怎么实现的?
-
 #### String 字符串
 Redis中字符串是由redis自己构建的一种名为简单动态字符串(simple dynamic string, SDS)的抽象类型来表示的,
 并将SDS用作Redis的默认字符串表示.
@@ -673,7 +709,6 @@ struct sdshdr {
     char buf[];
 }
 ```
-
 #### List 列表
 redis 构建了自己的链表实现
 ```C++
