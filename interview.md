@@ -29,7 +29,7 @@ B要插入的记录计算出来的桶索引是一样的，那么当线程B成功
 ② 另外一个比较明显的线程不安全的问题是HashMap的get操作可能因为resize而引起死循环（cpu100%），具体分析如下：
 下面的代码是resize的核心内容：
 
-<code>
+```java
 void transfer(Entry[] newTable, boolean rehash) {
     int newCapacity = newTable.length;
     for (Entry<K,V> e : table) {
@@ -45,7 +45,7 @@ void transfer(Entry[] newTable, boolean rehash) {
         }
     }
 }
-</code>
+```
 这个方法的功能是将原来的记录重新计算在新桶的位置，然后迁移过去。
 
 ![多线程HashMap的resize](resize.png)
@@ -69,7 +69,7 @@ void transfer(Entry[] newTable, boolean rehash) {
 ⑤ threshold：阈值, 决定了HashMap何时扩容, 以及扩容后的大小, 一般等于table大小乘以loadFactor.
 值得注意的是, 当我们自定义HashMap初始容量大小时, 构造函数并非直接把我们定义的数值当做HashMap容量大小,
 而是把该数值当做参数调用方法tableSizeFor, 然后把返回值作为HashMap的初始容量大小：
-<code>
+```java
 /**
  *Returns a power of two size for the givenk target capacity.
  */
@@ -82,10 +82,10 @@ static final int tableSizeFor(int cap) {
     n |= n >>> 16;
     return (n < 0) ? 1 : (n >= MAXIMUM_CAPACITY) ? MAXIMUM_CAPACITY : n + 1;
 }
-</code>
+```
 该方法会返回一个大于等于当前参数的2的倍数, 因此HashMap中的table数组的容量大小总是2的倍数.
 HashMap使用的是懒加载, 构造完HashMap对象后, 只要不进行put 方法插入元素之前, HashMap并不会去初始化或者扩容table：
-<code>
+```java
 public V put(K key, V value) {
     return putVal(hash(key), key, value, false, true);
 }
@@ -104,15 +104,15 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent, boolean evict) {
     afterNodeInsertion(evict);
     return null;
 }
-</code>
+```
 在putVal方法第8、9行我们可以看到, 当首次调用put方法时, HashMap会发现table为空然后调用resize方法进行初始化
 在putVal方法第16、17行我们可以看到, 当添加完元素后, 如果HashMap发现size（元素总数）大于threshold（阈值）, 则会调用resize
 方法进行扩容在这里值得注意的是, 在putVal方法第10行我们可以看到, 插入元素的hash值是一个32位的int值, 而实际当前元素插入table
 的索引的值为 ：
-<code>
+```java
 (table.size - 1) & hash
 例如: 01111 & hash 等于hash值的后4位
-</code>
+```
 又由于table的大小一直是2的倍数, 2的N次方, 因此当前元素插入table的索引的值为其hash值的后N位组成的值
 
 ## 5. HashMap 1.7 与 1.8 的区别, 说明1.8做了哪些优化, 如何优化的?
@@ -166,13 +166,13 @@ wf.isEnQueued();//返回是否被垃圾回收器标记为即将回收的垃圾
 
 虚引用：
 垃圾回收时回收, 无法通过引用取到对象值, 可以通过如下代码实现
-<code>
+```java
 Object obj = new Object();
 PhantomReference<Object> pf = new PhantomReference<Object>(obj);
 obj=null;
 pf.get();//永远返回null
 pf.isEnQueued();//返回是否从内存中已经删除
-</code>
+```
 虚引用是每次垃圾回收的时候都会被回收, 通过虚引用的get方法永远获取到的数据为null, 因此也被成为幽灵引用。
 虚引用主要用于检测对象是否已经从内存中删除。
 
@@ -241,7 +241,7 @@ Java中数组存储两类事物: 基本数据类型或者引用(对象指针).
 对于数组也是同样的方式.
 Java中的数组,也是对象(继承Object),因此数组所在的区域和对象是一样的.
 
-<code>
+```java
 class A {
     int x;
     int y;
@@ -253,7 +253,7 @@ public void m1() {
 public void m2() {
     A a = new A();
 }
-</code>
+```
 
 上面的代码片段中,让我们执行 m1()方法看看发生了什么:
     ① 当 m1 被调用时,一个新的栈帧(Frame-1)被压入JVM栈中,当然,相关的局部变量也在 Frame-1中创建, 比如 i;
@@ -530,7 +530,7 @@ BeanFactory是Spring IOC最基本的容器，负责生产和管理bean，它为�
 DefaultListableBeanFactory, XmlBeanFactory, ApplicationContext 等具体的容器都是实现了BeanFactory，
 再在其基础之上附加了其他的功能。
 下面可以看看BeanFactory提供的基本功能：
-<code>
+```java
 public interface BeanFactory {
     String FACTORY_BEAN_PREFIX = "&";
     Object getBean(String name) throws BeansException;
@@ -544,18 +544,18 @@ public interface BeanFactory {
     Class<?> getType(String name) throws NoSuchBeanDefinitionException;
     String[] getAliases(String name);
 }
-</code>
+```
 #### FactoryBean:
 FactoryBean是一个接口，当在IOC容器中的Bean实现了FactoryBean接口后，通过getBean(String BeanName)获取到的Bean
 对象并不是FactoryBean的实现类对象，而是这个实现类中的getObject()方法返回的对象。要想获取FactoryBean的实现类，
 就要getBean(&BeanName)，在BeanName之前加上&。
-<code>
+```java
 public interface FactoryBean<T> {
     T getObject() throws Exception;
     Class<?> getObjectType();
     boolean isSingleton();
 }
-</code>
+```
 
 #### 区别
 通过以上源码和示例来看，基本上能印证以下结论，也就是二者的区别。
@@ -587,7 +587,7 @@ BeanFactory
 一般情况下我们都是通过配置文件（xml,properties）的方式对bean进行配置，每种文件都需要实现BeanDefinitionReader,因此是
 reader本身现了配置文字 到bean对象的转换过程。当然我们自己也可以实现任意格式的配置文件，只需要自己来实现reader即可。Bean
 的生成大致可以分为两个阶段：容器启动阶段和bean实例化阶段
-![bean.png](bean初始化过程)
+![bean初始化过程](bean.png)
 容器启动阶段:
 ① 加载配置文件(通常是xml文件)
 ② 通过reader生成BeanDefinition
@@ -660,7 +660,7 @@ ApplicationContext 容器建立BeanFactory之上，拥有BeanFactory的所有功
 #### String 字符串
 Redis中字符串是由redis自己构建的一种名为简单动态字符串(simple dynamic string, SDS)的抽象类型来表示的,
 并将SDS用作Redis的默认字符串表示.
-<code>
+```java
 struct sdshdr { 
     // 记录buf数组中已使用字节的数量
     // 等于SDS中所保存字符串的长度
@@ -672,10 +672,11 @@ struct sdshdr {
     // 字节数组, 用于保存字符串
     char buf[];
 }
-</code>
+```
 
 #### List 列表
 redis 构建了自己的链表实现
+```C++
 typedef struct listNode {
     // 前置节点
     struct listNode * prev;
@@ -686,6 +687,7 @@ typedef struct listNode {
     // 节点的值
     void * value;
 } listNode
+```
 Redis里的链表并没有什么特别需要说明的地方，和其他语言中的链表类似，定义了链表节点listNode结构，包含
 prev(listNode)属性，next(listNode)属性，value属性的结构，同时使用list来持有链表，list的结构包含
 head(listNode)属性，tail(listNode)属性，len(long)属性，还有一些方法，如复制，释放，对比函数
@@ -695,6 +697,7 @@ head(listNode)属性，tail(listNode)属性，len(long)属性，还有一些方�
 字典，又称为符号表，关联数组，或者映射，是一种用于保存键值对的抽象数据结构。可以说Redis里所有的结构
 都是用字典来存储的。那么字典是如何来使先的呢？字典的结构从高层到底层实现分别是：字典（dict），字典哈
 希表（dictht），哈希表节点（dictEntry）。我们先来看看字典哈希表和哈希表节点
+```C++
 typedef struct dictht {
     //哈希表数组
     dictEntry **table;
@@ -707,7 +710,7 @@ typedef struct dictht {
     //该哈希表已有的节点的数量
     unsigned long used;
 } dictht
-
+```
 注释已经很好的解释了每个变量的含义，下面我们来看看dictEntry的结构类型，其中key表示键的指针，v表示值，
 这个值可以是一个指针val，也可以是无符号整数或者有符号整数。
 #### Set 集合
@@ -756,14 +759,14 @@ typedef struct dictht {
 ② 共享资源（各个系统访问同一资源，资源的载体可能是传统关系型数据库或者NoSQL）。
 ③ 同步访问（即有多个进程同时访问同一个共享资源。没有同步访问，谁管你资源竞争不竞争）。
 应用场景：
-<code>
+```java
 long N=0L;
 //N从redis获取值
 if(N<5){
     N++；
     //N写回redis
 }
-</code>
+```
 应用场景很常见，像秒杀，全局递增id，ip访问限制等。以IP访问限制来说，恶意攻击者可能发起无限次访问，并发量
 比较大，分布式环境下对N的边界检查就不可靠，因为从redis读的N可能已经是脏数据。传统的加锁做法也没用，因为这是
 分布式环境，这个同步问题的救火队员也束手无策。
@@ -827,14 +830,14 @@ redis的并发竞争问题, 主要发生在并发写竞争.
 
 使用乐观锁解决,成本较低, 非阻塞, 性能较高
 本质上是假设不会进行冲突, 使用redis的命令watch进行构造条件. 伪代码:
-<code>
+```sh
 watch price
 get price $price
 $price = $price + 10
 multi
 set price $price
 exec
-</code>
+```
 watch这里表示监控该key值，后面的事务是有条件的执行，如果从watch的exec语句执行时，watch的key对应的value值被修改了，
 则事务不会执行。
 
@@ -866,18 +869,18 @@ Redis作为一个高性能的内存NoSQL数据库，其容量受到最大内存�
 用户在使用阿里云Redis时，除了对性能，稳定性有很高的要求外，对内存占用也比较敏感。
 在使用过程中，有些用户会觉得自己的线上实例内存占用比自己预想的要大。事实上，实例中的内存除了保存
 原始的键值对所需的开销外，还有一些运行时产生的额外内存，包括：
-#### ① 垃圾数据和过期Key所占空间
-#### ② 字典渐进式Rehash导致未及时删除的空间
-#### ③ Redis管理数据，包括底层数据结构开销，客户端信息，读写缓冲区等
-#### ④ 主从复制，bgsave时的额外开销
-#### ⑤ 其它
+① 垃圾数据和过期Key所占空间
+② 字典渐进式Rehash导致未及时删除的空间
+③ Redis管理数据，包括底层数据结构开销，客户端信息，读写缓冲区等
+④ 主从复制，bgsave时的额外开销
+⑤ 其它
 ### Redis过期数据清理策略
 #### 过期数据清理时机
 为了防止一次性清理大量过期Key导致Redis服务受影响，Redis只在空闲时清理过期Key。
 具体Redis逐出过期Key的时机为:
 
 ① 访问Key时，会判断Key是否过期，逐出过期Key;
-<code>
+```java
 robj *lookupKeyRead(redisDb *db, robj *key) {
     robj *val;
     expireIfNeeded(db,key);
@@ -885,10 +888,10 @@ robj *lookupKeyRead(redisDb *db, robj *key) {
     ...
     return val;
 }
-</code>
+```
 
 ② CPU空闲时在定期serverCron任务中，逐出部分过期Key;
-<code>
+```java
     aeCreateTimeEvent(server.el, 1, serverCron, NULL, NULL)
 
     int serverCron(struct aeEventLoop *eventLoop, long long id, void *clientData) {
@@ -904,9 +907,10 @@ robj *lookupKeyRead(redisDb *db, robj *key) {
             activeExpireCycle(ACTIVE_EXPIRE_CYCLE_SLOW);
             ...
     }
-</code>
+```
 
 ③ 每次事件循环执行的时候，逐出部分过期Key;
+```java
     void aeMain(aeEventLoop *eventLoop) {
         eventLoop->stop = 0;
         while (!eventLoop->stop) {
@@ -915,16 +919,15 @@ robj *lookupKeyRead(redisDb *db, robj *key) {
             aeProcessEvents(eventLoop, AE_ALL_EVENTS);
         }
     }
-
+```
+```java
     void beforeSleep(struct aeEventLoop *eventLoop) {
-        ...
         /* Run a fast expire cycle (the called function will return
          - ASAP if a fast cycle is not needed). */
         if (server.active_expire_enabled && server.masterhost == NULL)
             activeExpireCycle(ACTIVE_EXPIRE_CYCLE_FAST);
-        ...
     }
-
+```
 #### 过期数据清理算法
 Redis过期Key清理的机制对清理的频率和最大时间都有限制，在尽量不影响正常服务的情况下，进行
 过期Key的清理，以达到长时间服务的性能最优.
@@ -944,7 +947,7 @@ Redis会周期性的随机测试一批设置了过期时间的key并进行处理
 
 ### Redis数据逐出策略
 #### 数据逐出时机
-<code>
+```java
 // 执行命令
 int processCommand(redisClient *c) {
         ...
@@ -959,7 +962,7 @@ int processCommand(redisClient *c) {
     }
     ...
 }
-</code>
+```
 
 #### 数据逐出算法
 在逐出算法中，根据用户设置的逐出策略，选出待逐出的key，直到当前内存小于最大内存值为主.
@@ -1013,14 +1016,41 @@ JVM中的程序计数器和计算机组成原理中提到的程序计数器PC概
 
 ## 2. 讲讲什么情况下会出内存溢出, 内存泄漏?
 ## 3. 说说java线程栈
+线程栈是指某时刻内存中线程调度的栈信息, 当前调用的方法总是位于栈顶, 线程栈的内容随着线程的运行状态变化而变化, 研究线程栈必须选择一个运行的时刻.
+
+线程生命周期:
+新建 New
+可运行 Runnable
+运行 Running
+阻塞 Blocking
+死亡 Dead
+
+线程阻塞有多种
+睡眠(sleep), 等待(yield), 获取线程锁而阻塞
+1、调用线程的sleep()方法，使线程睡眠一段时间
+2、调用线程的yield()方法，使线程暂时回到可运行状态，来使其他线程有机会执行。
+3、调用线程的join()方法，使当前线程停止执行，直到当前线程中加入的线程执行完毕后，当前线程才可以执行。
 ## 4. JVM年轻代到老年代的晋升过程的判断条件是什么?
 ## 5. JVM出现fullGC很频繁, 怎么去线上排查问题?
 ## 6. 类加载为什么要使用双亲委派模式, 有没有什么场景是打破了这个模式?
+类加载器的双亲委派模式是在jdk1.2期间被引入并被广泛运用于之后所有的java程序中, 但它并不是一个强制性的约束模型, 而是Java设计者推荐给Java开发者的一种类加载器实现方式.
+双亲委派的工作过程: 
+如果一个类加载器收到一个类加载请求, 首先它不会尝试自己去加载这个类, 而是把这个请求委派给父类加载器去完成, 每个层次的加载器都是如此, 因此所有的加载请求都应该传送到顶层的类加载器中, 只有当父加载器反馈自己无法完成这个加载请求(它的搜索范围中没有找到所需要的类)的时候, 子加载器才会尝试自己去加载.
+使用双亲委派模式来组织类加载器之间的关系, 一个显而易见的好处是Java类随着他的类加载器一起具备了一种带有优先级的层次关系. 例如java.lang.Object类, 它存放在rt.jar中, 无论哪一个类加载器要加载这个类,  最终都是委派给处于模型顶端的启动类加载器进行加载, 因此Object类在程序的各种类加载器环境中都是同一个类. 相反, 如果没有双亲委派模型, 由各个类加载器自行去加载的话, 如果用户编写了一个称为java.lang.Object类, 并放在程序的ClassPath中, 那系统中将会出现多个不同的Object类, java类型体系中最基础的行为也就无法保证, 应用程序也将变得一片混乱.
+
+有三个场景打破了这个模式:
+① jdk1.2之前, 允许用户继承java.lang.ClassLoader重写loadClass
+② 双亲委派很好的解决了各个类加载器的基础类统一问题, 但如果基础类要调用回用户代码, 这时, 启动类加载器无法识别这些类. 例如 JNDI.
+③ 用户对于程序动态性的追求导致(即代码热替换, 模块热部署等), 这时, 自定义的类加载器出现的不符合双亲委派原则的行为.
+
 ## 7. 类的实例化顺序
+
+先父类再子类
+先静态变量, 静态方法, 再构造方法, 然后普通变量, 普通方法 
 ## 8. JVM垃圾回收机制, 何时触发MinorGC等操作
+当Eden区没有足够的空间来分配的时候触发Minor GC.
 ## 9. JVM中一次完整的GC流程(从 ygc 到 fgc)是怎么样的
 ## 10. 各种回收器, 各自优缺点, 重点CMS, G1
-
 ### Serial收集器
 Serial收集器是最古老的收集器, 它的缺点是当Serial收集器想进行垃圾回收的时候, 必须暂停用户的所有进程, 即stop the world. 到现在为止, 它依然在虚拟机运行在client模式下的默认新生代收集器. 与其他收集器相比, 对于限定在单个cpu的运行环境来说, Serial收集器由于没有线程交互的开销, 专心做垃圾回收自然可以获得最高的单线程收集效率.
 Serial old是Serial收集器的老年代版本, 它同样是一个单线程收集器, 使用标记-整理算法. 这个收集器的主要意义也是被Client模式下的虚拟机使用. 在Server模式下, 它主要还有两大用途: 一个是jdk1.5及以前的版本中与Parallel Scanvenge收集器搭配使用, 另外一个就是作为CMS收集器的后备预案, 在并发收集发生Concurrent Mode Failure的时候使用.
@@ -1113,3 +1143,14 @@ Java中可以被作为GC Roots中的对象有：
 增量算法的基本思想是, 如果一次性将所有的垃圾进行处理, 需要造成系统长时间的停顿, 那么就可以让垃圾收集线程和应用程序线程交替执行. 每次, 垃圾收集线程只收集一片区域的内存空间, 接着切换到应用程序线程. 依次反复, 知道垃圾收集完成. 使用这种方式, 由于在垃圾回收过程中, 间断性地还执行了应用程序代码, 所以能减少系统的停顿时间. 但是因为线程切换和上下文转换的消耗, 会使得垃圾回收的总成本上升, 造成系统吞吐量的下降. 
 
 ## 12. OOM错误, stackoverflow错误, permgen space错误
+
+
+## 13. ACID CAS CAP BASIC
+
+ACID: Atomic, Consistency, 
+
+CAS: compare and sweep
+
+CAP: Consistency, Aviliabel, Partition
+
+BASIC: 
