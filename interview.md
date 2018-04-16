@@ -1311,11 +1311,17 @@ JVM中的程序计数器和计算机组成原理中提到的程序计数器PC概
 先父类再子类
 先静态变量, 静态方法, main(), 再构造块, 构造方法, 然后普通变量, 普通方法 
 ## 8. JVM垃圾回收机制, 何时触发MinorGC等操作
+<<<<<<< Updated upstream
 当Eden区没有足够的空间来分配的时候触发Minor GC.
 新生代 GC (Minor GC): 指发生在新生代的垃圾收集动作, 因为 Java 对象大多都具备朝生夕灭的特性, 所以 Minor GC 非常频繁, 一般回收速度也比较快.
 老年代 GC (Major GC / Full GC): 指发生在老年代的 GC, 出现了 Major GC, 经常会伴随至少一次的 Minor GC(但非绝对, 在 Parallel Scanvenge 收集器的收集策略里就有直接进行 Major GC的策略选择过程). Major GC 的速度一般会比 Minor GC 慢10倍以上. 
 
 大多数情况下, 对象在 新生代Eden 区中分配, 当 Eden 区没有足够的空间进行分配时, 虚拟机将发起一次 Minor GC.
+=======
+
+大多数情况下, 新对象在新生代Eden区中分配. 当Eden区没有足够的空间进行分配时, 虚拟机将发起一次Minor GC.
+
+>>>>>>> Stashed changes
 ## 9. JVM中一次完整的GC流程(从 ygc 到 fgc)是怎么样的
 ## 10. 各种回收器, 各自优缺点, 重点CMS, G1
 ### Serial收集器
