@@ -335,7 +335,6 @@ O(N) -> O(lgN)
 
 
 ## 17. 线程池如何调优, 最大数目如何确认?
-
 创建线程及后续的销毁过程的代价是非常昂贵的, 因为jvm和操作系统都需要分配资源.
 如果手动创建线程, 如果不进行适当管理, 很可能引发灾难性后果.每个线程都需要一定的栈内存空间. 在最近
 的64位jvm中, 默认的栈大小是1024KB, 持续的创建线程会占用大量的线程栈空间, 每个线程代码执行过程中创
@@ -411,13 +410,26 @@ O(N) -> O(lgN)
 就可以用作节流阀。如果挤压的请求变得非常多，这时该池就会尝试运行更多的线程来清理；这时第二个节流阀—最大
 线程数就起作用了。
 
-
-
 ## 18. ThreadLocal原理, 用的时候需要注意什么?
-
 每一个线程的Thread对象都有一个ThreadLocalMap对象, 这个对象存储了一组以ThreadLocal.ThreadLocalHashCode为键, 以
 本地线程变量为值的 K-V 值对, ThreadLocal对象就是当前线程的 ThreadLocalMap的访问入口, 每一个ThreadLocal对象都包含
 一个独一无二的threadLocalHashCode值, 使用这个值就可以在线程 K-V 值中找回对应的本地线程变量.
+
+为什么使用弱引用
+从表面上看内存泄漏的根源在于使用了弱引用。网上的文章大多着重分析ThreadLocal使用了弱引用会导致内存泄漏，但是另一个问题也同样值得思考：为什么使用弱引用而不是强引用？
+
+我们先来看看官方文档的说法：
+
+To help deal with very large and long-lived usages, the hash table entries use WeakReferences for keys.
+为了应对非常大和长时间的用途，哈希表使用弱引用的 key。
+
+下面我们分两种情况讨论：
+
+key 使用强引用：引用的ThreadLocal的对象被回收了，但是ThreadLocalMap还持有ThreadLocal的强引用，如果没有手动删除，ThreadLocal不会被回收，导致Entry内存泄漏。
+key 使用弱引用：引用的ThreadLocal的对象被回收了，由于ThreadLocalMap持有ThreadLocal的弱引用，即使没有手动删除，ThreadLocal也会被回收。value在下一次ThreadLocalMap调用set,get，remove的时候会被清除。
+比较两种情况，我们可以发现：由于ThreadLocalMap的生命周期跟Thread一样长，如果都没有手动删除对应key，都会导致内存泄漏，但是使用弱引用可以多一层保障：弱引用ThreadLocal不会内存泄漏，对应的value在下一次ThreadLocalMap调用set,get,remove的时候会被清除。
+
+因此，ThreadLocal内存泄漏的根源是：由于ThreadLocalMap的生命周期跟Thread一样长，如果没有手动删除对应key就会导致内存泄漏，而不是因为弱引用。
 
 ### 注意事项:
 ① 初始化时, 使用initValue方法.
@@ -445,7 +457,6 @@ O(N) -> O(lgN)
 
 
 ## 24. 八种阻塞队列以及各个阻塞队列的特性
-
 #### ArrayBlockingQueue: 一个由数组结构组成的有界阻塞队列
 用数组实现的有界阻塞队列。此队列按照先进先出（FIFO）的原则对元素进行排序。默认情况下不保证访问者公平的访问队列，
 所谓公平访问队列是指阻塞的所有生产者线程或消费者线程，当队列可用时，可以按照阻塞的先后顺序访问队列，即先阻塞的
@@ -516,7 +527,6 @@ offerLast，peekFirst，peekLast等方法，以First单词结尾的方法，表�
 
 # Spring
 ## 1. BeanFactory 和 FactoryBean?
-
 #### Bean: Java类实例
 每一个Bean对应Spring容器里的一个Java实例. 
 定义Bean时通常需要指定两个属性。
@@ -601,7 +611,7 @@ ApplicationContext 容器建立BeanFactory之上，拥有BeanFactory的所有功
 ② 扩展了BeanFactory的功能，提供了更多企业级功能的支持。
 ## 4. Spring Bean 的生命周期, 如何被管理的?
 对于普通的 java 对象, 当 new 的时候创建对象, 当它没有任何引用的时候被垃圾回收机制回收. 而由 Spring IOC 容器托管的对象, 他们的生命周期完全有容器控制. Spring 中每个 Bean 的生命周期如下:
-![bean 的生命周期](bean生命周期.jpg)
+![bean 的生命周期](bean.jpg)
 ### 实例化 Bean
 对于 BeanFactory 容器, 当客户端请求一个尚未初始化的 bean 时, 或初始化 bean 的时候需要注入另一个尚未初始化的依赖时, 容器就会调用 createBean进行实例化.
 对于 ApplicationContext 容器, 容器启动结束后, 便实例化所有的 bean.
@@ -641,6 +651,141 @@ afterPropertiesSet()
 
 获取 bean, 从 beanDefinitionMap 中获取
 ## 6. 如果要你实现Spring AOP, 请问怎么实现?
+### 代理模式: 为其他对象提供一种代理以控制对这个对象的访问. 比如A对象要做一件事情，在没有代理前，自己来做，在对A代理后，由A的代理类B来做。代理其实是在原实例前后加了一层处理，这也是AOP的初级轮廓。
+### 静态代理原理及实践: 
+静态代理说白了就是在程序运行前就已经存在代理类的字节码文件，代理类和原始类的关系在运行前就已经确定。
+```java
+// 接口
+public interface IUserDao {
+	void save();
+	void find();
+}
+//目标对象
+class UserDao implements IUserDao{
+	@Override
+	public void save() {
+		System.out.println("模拟：保存用户！");
+	}
+	@Override
+	public void find() {
+		System.out.println("模拟：查询用户");
+	}
+}
+/**
+    静态代理
+          特点：
+	1. 目标对象必须要实现接口
+	2. 代理对象，要实现与目标对象一样的接口
+ */
+class UserDaoProxy implements IUserDao{
+	// 代理对象，需要维护一个目标对象
+	private IUserDao target = new UserDao();
+	@Override
+	public void save() {
+		System.out.println("代理操作： 开启事务...");
+		target.save();   // 执行目标对象的方法
+		System.out.println("代理操作：提交事务...");
+	}
+	@Override
+	public void find() {
+		target.find();
+	}
+}
+```
+静态代理虽然保证了业务类只需关注逻辑本身，代理对象的一个接口只服务于一种类型的对象，如果要代理的方法很多，势必要为每一种方法都进行代理。再者，如果增加一个方法，除了实现类需要实现这个方法外，所有的代理类也要实现此方法。增加了代码的维护成本。那么要如何解决呢?答案是使用动态代理。
+### 动态代理原理及实践
+动态代理类的源码是在程序运行期间通过JVM反射等机制动态生成，代理类和委托类的关系是运行时才确定的。
+```java
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+// 接口
+public interface IUserDao {
+	void save();
+	void find();
+}
+//目标对象
+ class UserDao implements IUserDao{
+	@Override
+	public void save() {
+		System.out.println("模拟： 保存用户！");
+	}
+	@Override
+	public void find() {
+		System.out.println("查询");
+	}
+}
+/**
+ * 动态代理：
+ *    代理工厂，给多个目标对象生成代理对象！
+ *
+ */
+class ProxyFactory {
+	// 接收一个目标对象
+	private Object target;
+	public ProxyFactory(Object target) {
+		this.target = target;
+	}
+	// 返回对目标对象(target)代理后的对象(proxy)
+	public Object getProxyInstance() {
+		Object proxy = Proxy.newProxyInstance(
+			target.getClass().getClassLoader(),  // 目标对象使用的类加载器
+			target.getClass().getInterfaces(),   // 目标对象实现的所有接口
+			new InvocationHandler() {			// 执行代理对象方法时候触发
+				@Override
+				public Object invoke(Object proxy, Method method, Object[] args)
+						throws Throwable {
+
+					// 获取当前执行的方法的方法名
+					String methodName = method.getName();
+					// 方法返回值
+					Object result = null;
+					if ("find".equals(methodName)) {
+						// 直接调用目标对象方法
+						result = method.invoke(target, args);
+					} else {
+						System.out.println("开启事务...");
+						// 执行目标对象方法
+						result = method.invoke(target, args);
+						System.out.println("提交事务...");
+					}
+					return result;
+				}
+			}
+		);
+		return proxy;
+	}
+}
+```
+在运行测试类中创建测试类对象代码中
+```java
+IUserDao proxy = (IUserDao)new ProxyFactory(target).getProxyInstance();
+```
+其实是jdk动态生成了一个类去实现接口,隐藏了这个过程:
+```java
+class $jdkProxy implements IUserDao{}
+```
+使用jdk生成的动态代理的前提是目标类必须有实现的接口。但这里又引入一个问题,如果某个类没有实现接口,就不能使用jdk动态代理,所以Cglib代理就是解决这个问题的。
+Cglib是以动态生成的子类继承目标的方式实现，在运行期动态的在内存中构建一个子类，如下:
+```java
+public class UserDao{}
+//Cglib是以动态生成的子类继承目标的方式实现,程序执行时,隐藏了下面的过程
+public class $Cglib_Proxy_class  extends UserDao{}
+```
+Cglib使用的前提是目标类不能为final修饰。因为final修饰的类不能被继承。
+现在，我们可以看看AOP的定义：面向切面编程，核心原理是使用动态代理模式在方法执行前后或出现异常时加入相关逻辑。
+通过定义和前面代码我们可以发现3点：
+
+AOP是基于动态代理模式。
+AOP是方法级别的（要测试的方法不能为static修饰，因为接口中不能存在静态方法，编译就会报错）。
+AOP可以分离业务代码和关注点代码（重复代码），在执行业务代码时，动态的注入关注点代码。切面就是关注点代码形成的类。
+
+前文提到jdk代理和cglib代理两种动态代理，优秀的spring框架把两种方式在底层都集成了进去,我们无需担心自己去实现动态生成代理。那么，spring是如何生成代理对象的？
+
+创建容器对象的时候，根据切入点表达式拦截的类，生成代理对象。
+如果目标对象有实现接口，使用jdk代理。如果目标对象没有实现接口，则使用cglib代理。然后从容器获取代理后的对象，在运行期植入"切面"类的方法。
+
+如果目标类没有实现接口，且class为final修饰的，则不能进行spring AOP编程！
 ## 7. 如果要你实现Spring IOC, 你会注意哪些问题?
 ## 8. Spring是如何管理事务的, 事务管理机制?
 ## 9. Spring的不同事务传播行为有哪些, 干什么用的?
@@ -648,10 +793,50 @@ afterPropertiesSet()
 ## 11. Spring MVC 的工作原理?
 ## 12. Spring 的循环注入的原理?
 ## 13. Spring AOP 的理解, 各个术语, 他们是怎么相互工作的?
+spring aop 即 面向切面编程.
+① 通知 (Advice)
+通知定义了切面是是什么及何时使用, 描述了切面要完成的工作及何时执行这个动作.
+② 连接点 (Joinpoint)
+程序执行的某个特定位置
+③ 切点 (Pointcut)
+在上面说的连接点的基础上，来定义切入点，你的一个类里，有15个方法，那就有几十个连接点了对把，但是你并不想在所有方法附近都使用通知（使用叫织入，以后再说），你只想让其中的几个，在调用这几个方法之前，之后或者抛出异常时干点什么，那么就用切点来定义这几个方法，让切点来筛选连接点，选中那几个你想要的方法。
+④ 切面 (Aspect)
+切面是通知和切入点的结合。现在发现了吧，没连接点什么事情，连接点就是为了让你好理解切点，搞出来的，明白这个概念就行了。通知说明了干什么和什么时候干（什么时候通过方法名中的before,after，around等就能知道），而切入点说明了在哪干（指定到底是哪个方法），这就是一个完整的切面定义。
+⑤ 引入 (introduction)
+允许我们向现有的类添加新方法属性, 这不就是把切面（也就是新方法属性：通知定义的）用到目标类中吗
 ## 14. Spring 如何保证Controller并发的安全?
+通常情况下不需要考虑多线程问题, spring mvc中的controller, service, dao对象默认是单例的即 scope是singleton.
+如果controller中有多线程公用的变量, 会导致多线程问题, 解决方法有几个:
+1、在控制器中不使用实例变量
+2、将控制器的作用域从单例改为原型，即在spring配置文件Controller中声明 scope="prototype"，每次都创建新的controller
+3、在Controller中使用ThreadLocal变量
 
 # Netty
-## 1. BIO, NIO和AIO
+## 1. BIO, 伪异步IO, NIO和AIO
+
+IO多路复用
+select epoll
+① epoll支持一个进程打开的socket描述符(fd)不受限制
+仅受限于操作系统的最大文件句柄数 => 通常与系统的内存关系比较大 1G内存机器上大约可以打开10万个句柄左右, 8G => 80万句柄左右
+② I/O效率不会随着FD数目的增加而线性下降
+select/poll每次调用回线性扫描全部的socket集合, 而epoll是根据每个fd上面的callback函数来实现的, 只有活跃的socket才会去主动掉说能callback, 其他idle的socket则不会
+③ 使用mmap加速内核与用户空间的消息传递
+无论是select, poll 还是epoll都需要内核把FD消息通知给用户空间, 如何避免不必要的内存复制就显得非常重要, epoll是通过内核和用户空间mmap同一块内存来实现的.
+④ epoll的API更加简单.
+包括创建一个epoll描述符, 添加监听事件, 阻塞等待所监听的事件发生, 关闭epoll描述符.
+
+### BIO Blocking I/O 同步阻塞I/O
+网络编程的基本模型是Client/Server模型, 也就是两个进程相互通信, 其中服务端提供位置信息, 客户端通过连接操作向服务端监听的地址发起连接请求, 通过三次握手连接成功后, 双方建立网络套接字进行通信.
+采用BIO通信模型的服务端, 通常由一个独立的Acceptor线程负责监听客户端连接, 它接收到客户端连接请求之后为每个客户端创建一个新的线程进行链路处理, 处理完成之后, 通过输出流返回应答给客户端, 线程销毁, 这就是典型的一请求一应答通信模型. 该模型的最大的问题就是缺乏弹性伸缩能力, 当客户端并发访问量增加后, 服务端的线程个数和客户端并发访问数呈1:1的正比关系, 由于线程是java虚拟机非常宝贵的系统资源, 当线程数膨胀之后, 系统的性能将急剧下降, 随着并发访问量的继续增大, 系统会发生线程堆栈溢出, 创建新线程失败等问题, 并最终导致进程宕机或者僵死, 不能对外提供服务.
+### 伪异步I/O
+采用线程池和任务队列可以实现一种叫做伪异步的I/O通信框架.
+当有新的客户端接入时, 将客户端的Socket封装成一个Task投递到后端的线程池中进行处理. JDK的线程池维护一个消息队列和N个活跃线程, 对消息队列中的任务进行处理, 由于线程池可以设置消息队列的大小和最大线程数, 因此, 它的资源占用是可控的, 无论多少个客户端并发访问, 都不会导致资源的耗尽和宕机.
+java同步I/O API说明, 当对Socket的输入流进行读取操作的时候, 它会一直阻塞下去, 直到发生如下的三种事件.
+① 有数据可读
+② 可用数据已经读取完毕
+③ 发生空指针或者I/O异常
+
+
 ## 2. Netty的各大组件?
 ## 3. Netty的线程模型?
 ## 4. TCP 粘包/拆包的原因及解决方法
@@ -894,7 +1079,14 @@ AOF持久化方式记录每次对服务器写的操作, 当服务器重启的时
 
 ## 6. Redis的缓存失效策略
 ## 7. Redis的集群, 高可用, 原理
+### 高可用
+高可用（High Availability），是当一台服务器停止服务后，对于业务及用户毫无影响。 停止服务的原因可能由于网卡、路由器、机房、CPU负载过高、内存溢出、自然灾害等不可预期的原因导致，在很多时候也称单点问题。
+### 如何容灾?
+redis提供了主从热备机制，主服务器的数据同步到从服务器，通过哨兵实时监控主服务器状态并负责选举主服务器。当发现主服务器异常时根据一定的算法重新选举主服务器并将问题服务器从可用列表中去除，最后通知客户端。主从是一对多的树型结构，如下图：
 
+
+### Sentinel 哨兵模式
+Sentinel 是 Redis的高可用解决方案: 由一个或多个Sentinel实例组成Sentinel系统可以监视任意多个主服务器, 以及这些主服务器的下属的所有从服务器, 并在监视的主服务器进入下线状态时, 自动将下线主服务器下属的某个从服务器升级为新的主服务器, 然后由新的主服务器代替已下线的主服务器继续处理命令请求
 
 
 ## 8. Redis缓存分片
@@ -1112,7 +1304,7 @@ JVM中的程序计数器和计算机组成原理中提到的程序计数器PC概
 ## 7. 类的实例化顺序
 
 先父类再子类
-先静态变量, 静态方法, 再构造方法, 然后普通变量, 普通方法 
+先静态变量, 静态方法, main(), 再构造块, 构造方法, 然后普通变量, 普通方法 
 ## 8. JVM垃圾回收机制, 何时触发MinorGC等操作
 当Eden区没有足够的空间来分配的时候触发Minor GC.
 新生代 GC (Minor GC): 指发生在新生代的垃圾收集动作, 因为 Java 对象大多都具备朝生夕灭的特性, 所以 Minor GC 非常频繁, 一般回收速度也比较快.
@@ -1217,10 +1409,40 @@ Java中可以被作为GC Roots中的对象有：
 
 ## 13. ACID CAS CAP BASIC
 
-ACID: Atomic, Consistency, 
+数据库事务本质ACID: Atomicity 原子性, Consistency 一致性, Isolation 隔离性, Durability 耐久
+数据库事务定义: 是指作为单个逻辑单元执行的一系列操作, 要么完全执行, 要不 
 
-CAS: compare and sweep
+CAS: compare and sweep 比较和交换
+有个问题 ABA, 可以通过版本号的方式解决.
 
-CAP: Consistency, Aviliabel, Partition
+
+
+CAP: 数据一致性 Consistency, 服务可用性 Availability, 分区容错性 Partition-tolerance
+CAP是分布式系统、特别是分布式存储领域中被讨论最多的理论，“什么是CAP定理？”在Quora 分布式系统分类下排名 FAQ 的 No.1。CAP在程序员中也有较广的普及，它不仅仅是“C、A、P不能同时满足，最多只能3选2”，以下尝试综合各方观点，从发展历史、工程实践等角度讲述CAP理论。希望大家透过本文对CAP理论有更多地了解和认识。
+#### 数据一致性(consistency)：如果系统对一个写操作返回成功，那么之后的读请求都必须读到这个新数据；如果返回失败，那么所有读操作都不能读到这个数据，对调用者而言数据具有强一致性(strong consistency) (又叫原子性 atomic、线性一致性 linearizable consistency)[5]
+#### 服务可用性(availability)：所有读写请求在一定时间内得到响应，可终止、不会一直等待
+#### 分区容错性(partition-tolerance)：在网络分区的情况下，被分隔的节点仍能正常对外服务
+
+在某时刻如果满足AP，分隔的节点同时对外服务但不能相互通信，将导致状态不一致，即不能满足C；如果满足CP，网络分区的情况下为达成C，请求只能一直等待，即不满足A；如果要满足CA，在一定时间内要达到节点状态一致，要求不能出现网络分区，则不能满足P。
+
+Partition字面意思是网络分区，即因网络因素将系统分隔为多个单独的部分，有人可能会说，网络分区的情况发生概率非常小啊，是不是不用考虑P，保证CA就好。要理解P，我们看回CAP证明中P的定义：
+```
+In order to model partition tolerance, the network will be allowed to lose arbitrarily many messages sent from one node to another.
+```
+网络分区的情况符合该定义，网络丢包的情况也符合以上定义，另外节点宕机，其他节点发往宕机节点的包也将丢失，这种情况同样符合定义。现实情况下我们面对的是一个不可靠的网络、有一定概率宕机的设备，这两个因素都会导致Partition，因而分布式系统实现中 P 是一个必须项，而不是可选项。
+对于分布式系统工程实践，CAP理论更合适的描述是：在满足分区容错的前提下，没有算法能同时满足数据一致性和服务可用性：
+```
+In a network subject to communication failures, it is impossible for any web service to implement an atomic read/write shared memory that guarantees a response to every request.
+```
+C/A不是非此即彼, 根据一致性和可用性的不同等级, 放开一些约束后可以兼顾一致性和可用性.
+
+CAP定理证明中的一致性指强一致性，强一致性要求多节点组成的被调要能像单节点一样运作、操作具备原子性，数据在时间、时序上都有要求。如果放宽这些要求，还有其他一致性类型：
+
+序列一致性(sequential consistency)：不要求时序一致，A操作先于B操作，在B操作后如果所有调用端读操作得到A操作的结果，满足序列一致性
+最终一致性(eventual consistency)：放宽对时间的要求，在被调完成操作响应后的某个时间点，被调多个节点的数据最终达成一致
+
+可用性在CAP定理里指所有读写操作必须要能终止，实际应用中从主调、被调两个不同的视角，可用性具有不同的含义。当P(网络分区)出现时，主调可以只支持读操作，通过牺牲部分可用性达成数据一致。
+
+工程实践中，较常见的做法是通过异步拷贝副本(asynchronous replication)、quorum/NRW，实现在调用端看来数据强一致、被调端最终一致，在调用端看来服务可用、被调端允许部分节点不可用(或被网络分隔)的效果
 
 BASIC: 
