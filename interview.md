@@ -264,8 +264,16 @@ public void m2() {
 
 # java并发
 ## 1. synchronized的实现原理以及锁优化
-
-
+synchronized关键字是最基本的互斥同步手段, 经过编译后, 会在同步块前后分别形成monitorenter 和 monitorexit两个字节码指令, 这两个字节码都需要一个reference类型参数来指明要锁定和解锁的对象, 如果java程序中明确指明了对象参数, 那就是这个对象的reference, 如果没有明确指定, 那就根据synchronized修饰的是实例方法还是类方法, 去取对应的对象实例或class对象来作为锁对象.
+在执行monitorenter指令时, 首先要尝试获取对象的锁. 如果这个对象没被锁定, 或者当前线程已经拥有了对象的锁, 把锁的计数器加1, 相应的, 在执行monitorexit指令时会将锁计数器减1, 当计数器为0 时, 锁就被释放. 如果获取对象锁失败, 那当前线程就要阻塞等待, 直到对象锁被另一个线程释放为止.
+### 锁优化
+适应性自旋 Adaptive Spinning:
+线程挂起和恢复都需要转入内核态中完成, 性能消耗大, 对于那些锁定状态持续时间很短的共享数据, 不值得. 我们可以让请求锁的线程"稍等一下", 但不放弃处理器的执行时间, 看看持有锁的线程是否很快就会释放锁. 为了让线程等待, 只需让线程执行一个忙循环(自旋), 这就是所谓的自旋锁.
+但自旋要有限度, 默认自旋10次, 可以通过-XX:PreBlockSpin更改, 而自适应的自旋锁意味着自旋的时间不再固定, 而是由前一次在同一个锁上的自旋时间和锁的拥有者的状态决定
+锁消除 Lock Elimination
+锁粗化 Lock Coarsening
+轻量级锁 Lightweight Locking
+偏向锁 Biased Locking
 
 ## 2. volatile的实现原理是
 
@@ -436,6 +444,7 @@ key 使用弱引用：引用的ThreadLocal的对象被回收了，由于ThreadLo
 ② 每一个线程都只是使用ThreadLocal标注变量的副本进行计算, 每一个线程的ThreadLocal变量值都是独立的, 不被其他线程影响.
 
 ## 19. CountDownLatch和CyclicBarrier的用法, 以及相互之间的差别?
+
 
 
 
@@ -1188,11 +1197,12 @@ Redis会周期性的随机测试一批设置了过期时间的key并进行处理
 // 执行命令
 int processCommand(redisClient *c) {
         ...
-        /* Handle the maxmemory directive.
-        **
-        First we try to free some memory if possible (if there are volatile
-        * keys in the dataset). If there are not the only thing we can do
-        * is returning an error. */
+        /**
+         * Handle the maxmemory directive.
+         * First we try to free some memory if possible (if there are volatile
+         * keys in the dataset). If there are not the only thing we can do
+         * is returning an error. 
+         */
         if (server.maxmemory) {
             int retval = freeMemoryIfNeeded();
             ...
@@ -1441,3 +1451,7 @@ CAP定理证明中的一致性指强一致性，强一致性要求多节点组�
 工程实践中，较常见的做法是通过异步拷贝副本(asynchronous replication)、quorum/NRW，实现在调用端看来数据强一致、被调端最终一致，在调用端看来服务可用、被调端允许部分节点不可用(或被网络分隔)的效果
 
 BASIC: 
+
+## 14. JVM参数
+-X: 表示 非标准 选项, 不是所有虚拟机都支持
+-XX: 表示 不稳定的, 不建议随便使用的 选项
