@@ -122,3 +122,85 @@ curl - X POST http://192.168.1.36:9200/search_idc/deco_company/2454354/_update
 
 列举相关实践项目、 总结和思考
   
+
+
+curl - XPOST http://192.168.1.36:29301/search_v160623/xiaoguotu/_search?search_type=DFS_QUERY_THEN_FETCH 
+-d'{
+    "from": 0,
+    "size": 10,
+    "query": {
+      "filtered": {
+        "query": {
+          "bool": {
+            "must": {
+              "match": {
+                "visible": {
+                  "query": 1,
+                  "type": "boolean"
+                }
+              }
+            },
+            "must_not": {
+              "match": {
+                "pid": {
+                  "query": 472390,
+                  "type": "boolean"
+                }
+              }
+            },
+            "should": [{
+              "match": {
+                "partid": {
+                  "query": 0,
+                  "type": "boolean"
+                }
+              }
+            }, {
+              "match": {
+                "oarea": {
+                  "query": 0,
+                  "type": "boolean"
+                }
+              }
+            }, {
+              "match": {
+                "styleid": {
+                  "query": 9,
+                  "type": "boolean"
+                }
+              }
+            }, {
+              "match": {
+                "zoneid": {
+                  "query": 3,
+                  "type": "boolean"
+                }
+              }
+            }, {
+              "match": {
+                "hxid": {
+                  "query": 0,
+                  "type": "boolean"
+                }
+              }
+            }, {
+              "match": {
+                "opriceid": {
+                  "query": 1,
+                  "type": "boolean"
+                }
+              }
+            }]
+          }
+        },
+        "filter": {
+          "match_all": {}
+        }
+      }
+    },
+    "_source": {
+      "includes": ["pid", "oldaid", "width", "height", "filename", "title", "source"],
+      "excludes": []
+    }
+  }
+'
