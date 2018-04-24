@@ -1,0 +1,187 @@
+[11.844s][info   ][gc,start      ] GC(13) Pause Young (G1 Evacuation Pause)
+[11.844s][info   ][gc,task       ] GC(13) Using 4 workers of 4 for evacuation
+[11.866s][info   ][gc,phases     ] GC(13)   Pre Evacuate Collection Set: 0.0ms
+[11.866s][info   ][gc,phases     ] GC(13)   Evacuate Collection Set: 21.0ms
+[11.866s][info   ][gc,phases     ] GC(13)   Post Evacuate Collection Set: 0.5ms
+[11.866s][info   ][gc,phases     ] GC(13)   Other: 0.1ms
+[11.866s][info   ][gc,heap       ] GC(13) Eden regions: 99->0(97)
+[11.866s][info   ][gc,heap       ] GC(13) Survivor regions: 11->14(14)
+[11.866s][info   ][gc,heap       ] GC(13) Old regions: 161->176
+[11.866s][info   ][gc,heap       ] GC(13) Humongous regions: 2->2
+[11.866s][info   ][gc,metaspace  ] GC(13) Metaspace: 28919K->28919K(1075200K)
+[11.866s][info   ][gc            ] GC(13) Pause Young (G1 Evacuation Pause) 273M->191M(415M) 21.693ms
+[11.866s][info   ][gc,cpu        ] GC(13) User=0.09s Sys=0.00s Real=0.02s
+[12.028s][info   ][gc,start      ] GC(14) Pause Young (G1 Evacuation Pause)
+[12.028s][info   ][gc,task       ] GC(14) Using 4 workers of 4 for evacuation
+[12.061s][info   ][gc,phases     ] GC(14)   Pre Evacuate Collection Set: 0.0ms
+[12.061s][info   ][gc,phases     ] GC(14)   Evacuate Collection Set: 32.6ms
+[12.061s][info   ][gc,phases     ] GC(14)   Post Evacuate Collection Set: 0.2ms
+[12.061s][info   ][gc,phases     ] GC(14)   Other: 0.1ms
+[12.061s][info   ][gc,heap       ] GC(14) Eden regions: 97->0(89)
+[12.061s][info   ][gc,heap       ] GC(14) Survivor regions: 14->14(14)
+[12.061s][info   ][gc,heap       ] GC(14) Old regions: 176->201
+[12.061s][info   ][gc,heap       ] GC(14) Humongous regions: 2->2
+[12.061s][info   ][gc,metaspace  ] GC(14) Metaspace: 28919K->28919K(1075200K)
+[12.061s][info   ][gc            ] GC(14) Pause Young (G1 Evacuation Pause) 288M->217M(415M) 32.980ms
+[12.061s][info   ][gc,cpu        ] GC(14) User=0.09s Sys=0.00s Real=0.03s
+[12.218s][info   ][gc,start      ] GC(15) Pause Initial Mark (G1 Evacuation Pause)
+[12.218s][info   ][gc,task       ] GC(15) Using 4 workers of 4 for evacuation
+[12.242s][info   ][gc,phases     ] GC(15)   Pre Evacuate Collection Set: 0.0ms
+[12.242s][info   ][gc,phases     ] GC(15)   Evacuate Collection Set: 24.1ms
+[12.242s][info   ][gc,phases     ] GC(15)   Post Evacuate Collection Set: 0.2ms
+[12.242s][info   ][gc,phases     ] GC(15)   Other: 0.2ms
+[12.242s][info   ][gc,heap       ] GC(15) Eden regions: 89->0(81)
+[12.242s][info   ][gc,heap       ] GC(15) Survivor regions: 14->13(13)
+[12.242s][info   ][gc,heap       ] GC(15) Old regions: 201->225
+[12.242s][info   ][gc,heap       ] GC(15) Humongous regions: 2->2
+[12.242s][info   ][gc,metaspace  ] GC(15) Metaspace: 28919K->28919K(1075200K)
+[12.242s][info   ][gc            ] GC(15) Pause Initial Mark (G1 Evacuation Pause) 306M->239M(415M) 24.515ms
+[12.242s][info   ][gc,cpu        ] GC(15) User=0.12s Sys=0.00s Real=0.02s
+[12.242s][info   ][gc            ] GC(16) Concurrent Cycle
+[12.242s][info   ][gc,marking    ] GC(16) Concurrent Clear Claimed Marks
+[12.242s][info   ][gc,marking    ] GC(16) Concurrent Clear Claimed Marks 0.018ms
+[12.242s][info   ][gc,marking    ] GC(16) Concurrent Scan Root Regions
+[12.261s][info   ][gc,marking    ] GC(16) Concurrent Scan Root Regions 18.413ms
+[12.261s][info   ][gc,marking    ] GC(16) Concurrent Mark (12.261s)
+[12.261s][info   ][gc,marking    ] GC(16) Concurrent Mark From Roots
+[12.261s][info   ][gc,task       ] GC(16) Using 1 workers of 1 for marking
+[12.420s][info   ][gc,start      ] GC(17) Pause Young (G1 Evacuation Pause)
+[12.420s][info   ][gc,task       ] GC(17) Using 4 workers of 4 for evacuation
+[12.446s][info   ][gc,phases     ] GC(17)   Pre Evacuate Collection Set: 0.0ms
+[12.446s][info   ][gc,phases     ] GC(17)   Evacuate Collection Set: 23.4ms
+[12.446s][info   ][gc,phases     ] GC(17)   Post Evacuate Collection Set: 2.6ms
+[12.446s][info   ][gc,phases     ] GC(17)   Other: 0.1ms
+[12.446s][info   ][gc,heap       ] GC(17) Eden regions: 81->0(116)
+[12.446s][info   ][gc,heap       ] GC(17) Survivor regions: 13->12(12)
+[12.446s][info   ][gc,heap       ] GC(17) Old regions: 225->249
+[12.446s][info   ][gc,heap       ] GC(17) Humongous regions: 2->2
+[12.446s][info   ][gc,metaspace  ] GC(17) Metaspace: 28921K->28921K(1075200K)
+[12.446s][info   ][gc            ] GC(17) Pause Young (G1 Evacuation Pause) 320M->262M(556M) 26.151ms
+[12.446s][info   ][gc,cpu        ] GC(17) User=0.12s Sys=0.00s Real=0.03s
+[12.537s][info   ][gc,marking    ] GC(16) Concurrent Mark From Roots 275.951ms
+[12.537s][info   ][gc,marking    ] GC(16) Concurrent Mark (12.261s, 12.537s) 275.986ms
+[12.537s][info   ][gc,start      ] GC(16) Pause Remark
+[12.541s][info   ][gc,stringtable] GC(16) Cleaned string and symbol table, strings: 16088 processed, 65 removed, symbols: 92569 processed, 57 removed
+[12.541s][info   ][gc            ] GC(16) Pause Remark 265M->265M(556M) 3.756ms
+[12.541s][info   ][gc,cpu        ] GC(16) User=0.00s Sys=0.00s Real=0.00s
+[12.541s][info   ][gc,marking    ] GC(16) Concurrent Create Live Data
+[12.599s][info   ][gc,marking    ] GC(16) Concurrent Create Live Data 58.453ms
+[12.600s][info   ][gc,start      ] GC(16) Pause Cleanup
+[12.601s][info   ][gc            ] GC(16) Pause Cleanup 270M->266M(556M) 0.918ms
+[12.601s][info   ][gc,cpu        ] GC(16) User=0.00s Sys=0.00s Real=0.00s
+[12.601s][info   ][gc,marking    ] GC(16) Concurrent Complete Cleanup
+[12.601s][info   ][gc,marking    ] GC(16) Concurrent Complete Cleanup 0.035ms
+[12.601s][info   ][gc,marking    ] GC(16) Concurrent Cleanup for Next Mark
+[12.607s][info   ][gc,marking    ] GC(16) Concurrent Cleanup for Next Mark 5.472ms
+[12.607s][info   ][gc            ] GC(16) Concurrent Cycle 364.219ms
+[12.822s][info   ][gc,start      ] GC(18) Pause Young (G1 Evacuation Pause)
+[12.822s][info   ][gc,task       ] GC(18) Using 4 workers of 4 for evacuation
+[12.855s][info   ][gc,phases     ] GC(18)   Pre Evacuate Collection Set: 0.0ms
+[12.855s][info   ][gc,phases     ] GC(18)   Evacuate Collection Set: 32.7ms
+[12.855s][info   ][gc,phases     ] GC(18)   Post Evacuate Collection Set: 0.2ms
+[12.855s][info   ][gc,phases     ] GC(18)   Other: 0.1ms
+[12.855s][info   ][gc,heap       ] GC(18) Eden regions: 116->0(11)
+[12.855s][info   ][gc,heap       ] GC(18) Survivor regions: 12->16(16)
+[12.855s][info   ][gc,heap       ] GC(18) Old regions: 245->273
+[12.855s][info   ][gc,heap       ] GC(18) Humongous regions: 2->2
+[12.855s][info   ][gc,metaspace  ] GC(18) Metaspace: 28924K->28924K(1075200K)
+[12.855s][info   ][gc            ] GC(18) Pause Young (G1 Evacuation Pause) 374M->290M(556M) 33.159ms
+[12.855s][info   ][gc,cpu        ] GC(18) User=0.12s Sys=0.00s Real=0.03s
+[12.885s][info   ][gc,start      ] GC(19) Pause Mixed (G1 Evacuation Pause)
+[12.885s][info   ][gc,task       ] GC(19) Using 4 workers of 4 for evacuation
+[12.898s][info   ][gc,phases     ] GC(19)   Pre Evacuate Collection Set: 0.0ms
+[12.898s][info   ][gc,phases     ] GC(19)   Evacuate Collection Set: 13.1ms
+[12.898s][info   ][gc,phases     ] GC(19)   Post Evacuate Collection Set: 0.3ms
+[12.898s][info   ][gc,phases     ] GC(19)   Other: 0.1ms
+[12.898s][info   ][gc,heap       ] GC(19) Eden regions: 11->0(23)
+[12.898s][info   ][gc,heap       ] GC(19) Survivor regions: 16->4(4)
+[12.898s][info   ][gc,heap       ] GC(19) Old regions: 273->234
+[12.898s][info   ][gc,heap       ] GC(19) Humongous regions: 2->2
+[12.898s][info   ][gc,metaspace  ] GC(19) Metaspace: 28924K->28924K(1075200K)
+[12.898s][info   ][gc            ] GC(19) Pause Mixed (G1 Evacuation Pause) 301M->239M(556M) 13.604ms
+[12.898s][info   ][gc,cpu        ] GC(19) User=0.06s Sys=0.00s Real=0.01s
+[12.938s][info   ][gc,start      ] GC(20) Pause Mixed (G1 Evacuation Pause)
+[12.938s][info   ][gc,task       ] GC(20) Using 4 workers of 4 for evacuation
+[12.946s][info   ][gc,phases     ] GC(20)   Pre Evacuate Collection Set: 0.0ms
+[12.946s][info   ][gc,phases     ] GC(20)   Evacuate Collection Set: 7.7ms
+[12.946s][info   ][gc,phases     ] GC(20)   Post Evacuate Collection Set: 0.2ms
+[12.946s][info   ][gc,phases     ] GC(20)   Other: 0.1ms
+[12.946s][info   ][gc,heap       ] GC(20) Eden regions: 23->0(128)
+[12.946s][info   ][gc,heap       ] GC(20) Survivor regions: 4->4(4)
+[12.946s][info   ][gc,heap       ] GC(20) Old regions: 234->233
+[12.946s][info   ][gc,heap       ] GC(20) Humongous regions: 2->2
+[12.946s][info   ][gc,metaspace  ] GC(20) Metaspace: 28924K->28924K(1075200K)
+[12.946s][info   ][gc            ] GC(20) Pause Mixed (G1 Evacuation Pause) 262M->239M(556M) 8.091ms
+[12.946s][info   ][gc,cpu        ] GC(20) User=0.00s Sys=0.00s Real=0.01s
+[13.134s][info   ][gc,start      ] GC(21) Pause Young (G1 Evacuation Pause)
+[13.134s][info   ][gc,task       ] GC(21) Using 4 workers of 4 for evacuation
+[13.161s][info   ][gc,phases     ] GC(21)   Pre Evacuate Collection Set: 0.0ms
+[13.161s][info   ][gc,phases     ] GC(21)   Evacuate Collection Set: 26.7ms
+[13.161s][info   ][gc,phases     ] GC(21)   Post Evacuate Collection Set: 0.2ms
+[13.161s][info   ][gc,phases     ] GC(21)   Other: 0.1ms
+[13.161s][info   ][gc,heap       ] GC(21) Eden regions: 128->0(123)
+[13.161s][info   ][gc,heap       ] GC(21) Survivor regions: 4->17(17)
+[13.161s][info   ][gc,heap       ] GC(21) Old regions: 233->253
+[13.161s][info   ][gc,heap       ] GC(21) Humongous regions: 2->2
+[13.161s][info   ][gc,metaspace  ] GC(21) Metaspace: 28924K->28924K(1075200K)
+[13.161s][info   ][gc            ] GC(21) Pause Young (G1 Evacuation Pause) 367M->271M(556M) 27.140ms
+[13.161s][info   ][gc,cpu        ] GC(21) User=0.11s Sys=0.02s Real=0.03s
+
+
+
+
+
+
+
+
+
+
+
+ S0C    S1C     S0U    S1U      EC       EU        OC         OU        MC      MU    CCSC   CCSU      YGC    YGCT   FGC      FGCT     GCT
+ 0.0   17408.0  0.0   17408.0 133120.0 43008.0   418816.0   260925.0  29952.0 28924.0 3328.0 3042.4     20    0.445   0      0.000    0.445
+ 0.0   17408.0  0.0   17408.0 133120.0 43008.0   418816.0   260925.0  29952.0 28924.0 3328.0 3042.4     20    0.445   0      0.000    0.445
+ 0.0   17408.0  0.0   17408.0 133120.0 43008.0   418816.0   260925.0  29952.0 28924.0 3328.0 3042.4     20    0.445   0      0.000    0.445
+ 0.0   17408.0  0.0   17408.0 133120.0 43008.0   418816.0   260925.0  29952.0 28924.0 3328.0 3042.4     20    0.445   0      0.000    0.445
+ 0.0   17408.0  0.0   17408.0 133120.0 43008.0   418816.0   260925.0  29952.0 28924.0 3328.0 3042.4     20    0.445   0      0.000    0.445
+ 0.0   17408.0  0.0   17408.0 133120.0 43008.0   418816.0   260925.0  29952.0 28924.0 3328.0 3042.4     20    0.445   0      0.000    0.445
+ 0.0   17408.0  0.0   17408.0 133120.0 43008.0   418816.0   260925.0  29952.0 28924.0 3328.0 3042.4     20    0.445   0      0.000    0.445
+ 0.0   17408.0  0.0   17408.0 133120.0 43008.0   418816.0   260925.0  29952.0 28924.0 3328.0 3042.4     20    0.445   0      0.000    0.445
+ 0.0   17408.0  0.0   17408.0 133120.0 43008.0   418816.0   260925.0  29952.0 28924.0 3328.0 3042.4     20    0.445   0      0.000    0.445
+ 0.0   17408.0  0.0   17408.0 133120.0 43008.0   418816.0   260925.0  29952.0 28924.0 3328.0 3042.4     20    0.445   0      0.000    0.445
+ 0.0   17408.0  0.0   17408.0 133120.0 43008.0   418816.0   260925.0  29952.0 28924.0 3328.0 3042.4     20    0.445   0      0.000    0.445
+ 0.0   17408.0  0.0   17408.0 133120.0 43008.0   418816.0   260925.0  29952.0 28924.0 3328.0 3042.4     20    0.445   0      0.000    0.445
+ 0.0   17408.0  0.0   17408.0 133120.0 43008.0   418816.0   260925.0  29952.0 28924.0 3328.0 3042.4     20    0.445   0      0.000    0.445
+ 0.0   17408.0  0.0   17408.0 133120.0 43008.0   418816.0   260925.0  29952.0 28924.0 3328.0 3042.4     20    0.445   0      0.000    0.445
+ 0.0   17408.0  0.0   17408.0 133120.0 43008.0   418816.0   260925.0  29952.0 28924.0 3328.0 3042.4     20    0.445   0      0.000    0.445
+ 0.0   17408.0  0.0   17408.0 133120.0 43008.0   418816.0   260925.0  29952.0 28924.0 3328.0 3042.4     20    0.445   0      0.000    0.445
+ 0.0   17408.0  0.0   17408.0 133120.0 43008.0   418816.0   260925.0  29952.0 28924.0 3328.0 3042.4     20    0.445   0      0.000    0.445
+ 0.0   17408.0  0.0   17408.0 133120.0 43008.0   418816.0   260925.0  29952.0 28924.0 3328.0 3042.4     20    0.445   0      0.000    0.445
+ 0.0   17408.0  0.0   17408.0 133120.0 43008.0   418816.0   260925.0  29952.0 28924.0 3328.0 3042.4     20    0.445   0      0.000    0.445
+ 0.0   17408.0  0.0   17408.0 133120.0 43008.0   418816.0   260925.0  29952.0 28924.0 3328.0 3042.4     20    0.445   0      0.000    0.445
+
+
+
+
+
+  S0     S1     E      O      M      CCS      YGC   YGCT     FGC    FGCT     GCT
+  0.00 100.00  73.08  62.30  96.57  91.42     20    0.445     0    0.000    0.445
+  0.00 100.00  73.08  62.30  96.57  91.42     20    0.445     0    0.000    0.445
+  0.00 100.00  73.08  62.30  96.57  91.42     20    0.445     0    0.000    0.445
+  0.00 100.00  73.08  62.30  96.57  91.42     20    0.445     0    0.000    0.445
+  0.00 100.00  73.08  62.30  96.57  91.42     20    0.445     0    0.000    0.445
+  0.00 100.00  73.08  62.30  96.57  91.42     20    0.445     0    0.000    0.445
+  0.00 100.00  73.08  62.30  96.57  91.42     20    0.445     0    0.000    0.445
+  0.00 100.00  73.08  62.30  96.57  91.42     20    0.445     0    0.000    0.445
+  0.00 100.00  73.08  62.30  96.57  91.42     20    0.445     0    0.000    0.445
+  0.00 100.00  73.08  62.30  96.57  91.42     20    0.445     0    0.000    0.445
+  0.00 100.00  73.08  62.30  96.57  91.42     20    0.445     0    0.000    0.445
+  0.00 100.00  73.08  62.30  96.57  91.42     20    0.445     0    0.000    0.445
+  0.00 100.00  73.08  62.30  96.57  91.42     20    0.445     0    0.000    0.445
+  0.00 100.00  73.08  62.30  96.57  91.42     20    0.445     0    0.000    0.445
+  0.00 100.00  73.08  62.30  96.57  91.42     20    0.445     0    0.000    0.445
+  0.00 100.00  73.08  62.30  96.57  91.42     20    0.445     0    0.000    0.445
+  0.00 100.00  73.08  62.30  96.57  91.42     20    0.445     0    0.000    0.445
+  0.00 100.00  73.08  62.30  96.57  91.42     20    0.445     0    0.000    0.445
+  0.00 100.00  73.08  62.30  96.57  91.42     20    0.445     0    0.000    0.445
+  0.00 100.00  73.08  62.30  96.57  91.42     20    0.445     0    0.000    0.445
+
