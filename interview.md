@@ -571,8 +571,11 @@ public class Test {
 
 
 ## 16. 分析线程池的实现原理和线程的调度过程?
-
-
+一个线程池包括以下四个基本组成部分：
+<1> 线程池管理器（ThreadPool）：用于创建并管理线程池，包括创建线程池，销毁线程池，添加新任务；
+<2> 工作线程（PoolWorker）：我们把用来执行用户任务的线程称为工作线程,工作线程就是不断从队列中获取任务对象并执行对象上的业务方法。线程池中线程，在没有任务时处于等待状态，可以循环的执行任务；
+<3> 任务接口（Task）：每个任务必须实现的接口，以供工作线程调度任务的执行，它主要规定了任务的入口，任务执行完后的收尾工作，任务的执行状态等；
+<4> 任务队列（taskQueue）：用于存放没有处理的任务。提供一种缓冲机制。
 
 ## 17. 线程池如何调优, 最大数目如何确认?
 创建线程及后续的销毁过程的代价是非常昂贵的, 因为jvm和操作系统都需要分配资源.
@@ -681,8 +684,11 @@ key 使用弱引用：引用的ThreadLocal的对象被回收了，由于ThreadLo
 
 
 ## 20. LockSupport工具
-
-
+长久以来对线程阻塞与唤醒经常我们会使用object的wait和notify,除了这种方式，java并发包还提供了另外一种方式对线程进行挂起和恢复，它就是并发包子包locks提供的LockSupport。
+LockSupport 和 CAS 是Java并发包中很多并发工具控制机制的基础，它们底层其实都是依赖Unsafe实现。
+LockSupport是用来创建锁和其他同步类的基本线程阻塞原语。LockSupport 提供park()和unpark()方法实现阻塞线程和解除线程阻塞，LockSupport和每个使用它的线程都与一个许可(permit)关联。permit相当于1，0的开关，默认是0，调用一次unpark就加1变成1，调用一次park会消费permit, 也就是将1变成0，同时park立即返回。再次调用park会变成block（因为permit为0了，会阻塞在这里，直到permit变为1）, 这时调用unpark会把permit置为1。每个线程都有一个相关的permit, permit最多只有一个，重复调用unpark也不会积累。
+park()和unpark()不会有 “Thread.suspend和Thread.resume所可能引发的死锁” 问题，由于许可的存在，调用 park 的线程和另一个试图将其 unpark 的线程之间的竞争将保持活性。如果调用线程被中断，则park方法会返回。同时park也拥有可以设置超时时间的版本。
+需要特别注意的一点：park 方法还可以在其他任何时间“毫无理由”地返回，因此通常必须在重新检查返回条件的循环里调用此方法。从这个意义上说，park 是“忙碌等待”的一种优化，它不会浪费这么多的时间进行自旋，但是必须将它与 unpark 配对使用才更高效。
 
 ## 21. Condition接口及其实现原理
 
@@ -693,10 +699,106 @@ key 使用弱引用：引用的ThreadLocal的对象被回收了，由于ThreadLo
 
 
 ## 23. 分段锁的原理, 锁力度减小的思考
+在分析ConcurrentHashMap的源码的时候，了解到这个并发容器类的加锁机制是基于粒度更小的分段锁，分段锁也是提升多并发程序性能的重要手段之一。
+在并发程序中，串行操作是会降低可伸缩性，并且上下文切换也会减低性能。在锁上发生竞争时将通水导致这两种问题，使用独占锁时保护受限资源的时候，基本上是采用串行方式—-每次只能有一个线程能访问它。所以对于可伸缩性来说最大的威胁就是独占锁。
+我们一般有三种方式降低锁的竞争程度：
+1、减少锁的持有时间
+2、降低锁的请求频率
+3、使用带有协调机制的独占锁，这些机制允许更高的并发性。
+在某些情况下我们可以将锁分解技术进一步扩展为一组独立对象上的锁进行分解，这成为分段锁。其实说的简单一点就是：容器里有多把锁，每一把锁用于锁容器其中一部分数据，那么当多线程访问容器里不同数据段的数据时，线程间就不会存在锁竞争，从而可以有效的提高并发访问效率，这就是ConcurrentHashMap所使用的锁分段技术，首先将数据分成一段一段的存储，然后给每一段数据配一把锁，当一个线程占用锁访问其中一个段数据的时候，其他段的数据也能被其他线程访问。
+比如：在ConcurrentHashMap中使用了一个包含16个锁的数组，每个锁保护所有散列桶的1/16，其中第N个散列桶由第（N mod 16）个锁来保护。假设使用合理的散列算法使关键字能够均匀的分部，那么这大约能使对锁的请求减少到越来的1/16。也正是这项技术使得ConcurrentHashMap支持多达16个并发的写入线程。
+当然，任何技术必有其劣势，与独占锁相比，维护多个锁来实现独占访问将更加困难而且开销更加大。
+下面给出一个基于散列的Map的实现，使用分段锁技术。
+```java
+import java.util.Map;
 
-
-
-
+/**
+ * Created by louyuting on 17/1/10.
+ */
+public class StripedMap {
+    //同步策略: buckets[n]由 locks[n%N_LOCKS] 来保护
+    private static final int N_LOCKS = 16;//分段锁的个数
+    private final Node[] buckets;
+    private final Object[] locks;
+    /**
+     * 结点
+     * @param <K>
+     * @param <V>
+     */
+    private static class Node<K,V> implements Map.Entry<K,V>{
+        final K key;//key
+        V value;//value
+        Node<K,V> next;//指向下一个结点的指针
+        int hash;//hash值
+        //构造器，传入Entry的四个属性
+        Node(int h, K k, V v, Node<K,V> n) {
+            value = v;
+            next = n;//该Entry的后继
+            key = k;
+            hash = h;
+        }
+        public final K getKey() {
+            return key;
+        }
+        public final V getValue() {
+            return value;
+        }
+        public final V setValue(V newValue) {
+            V oldValue = value;
+            value = newValue;
+            return oldValue;
+        }
+    }
+    /**
+     * 构造器: 初始化散列桶和分段锁数组
+     * @param numBuckets
+     */
+    public StripedMap(int numBuckets) {
+        buckets = new Node[numBuckets];
+        locks = new Object[N_LOCKS];
+        for(int i=0; i<N_LOCKS; i++){
+            locks[i] = new Object();
+        }
+    }
+    /**
+     * 返回散列之后在散列桶之中的定位
+     * @param key
+     * @return
+     */
+    private final int hash(Object key){
+        return Math.abs(key.hashCode() % N_LOCKS);
+    }
+    /**
+     * 分段锁实现的get
+     * @param key
+     * @return
+     */
+    public Object get(Object key){
+        int hash = hash(key);//计算hash值
+        //获取分段锁中的某一把锁
+        synchronized (locks[hash% N_LOCKS]){
+            for(Node m=buckets[hash]; m!=null; m=m.next){
+                if(m.key.equals(key)){
+                    return m.value;
+                }
+            }
+        }
+        return null;
+    }
+    /**
+     * 清除整个map
+     */
+    public void clear() {
+        //分段获取散列桶中每个桶地锁，然后清除对应的桶的锁
+        for(int i=0; i<buckets.length; i++){
+            synchronized (locks[i%N_LOCKS]){
+                buckets[i] = null;
+            }
+        }
+    }
+}
+```
+上面的实现中：使用了N_LOCKS个锁对象数组，并且每个锁保护容器的一个子集，对于大多数的方法只需要回去key值的hash散列之后对应的数据区域的一把锁就行了。但是对于某些方法却要获得全部的锁，比如clear()方法，但是获得全部的锁不必是同时获得，可以使分段获得，具体的查看源码。
 ## 24. 八种阻塞队列以及各个阻塞队列的特性
 #### ArrayBlockingQueue: 一个由数组结构组成的有界阻塞队列
 用数组实现的有界阻塞队列。此队列按照先进先出（FIFO）的原则对元素进行排序。默认情况下不保证访问者公平的访问队列，
