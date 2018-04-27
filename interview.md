@@ -1163,8 +1163,57 @@ AOP可以分离业务代码和关注点代码（重复代码），在执行业�
 该事务更严格, 上面一个事务传播只是不支持而已, 有事务就挂起, 而PROPAGATION_NEVER传播级别要求上下文中不能存在事务, 一旦有事务, 就抛出runtime异常, 强制停止执行! 这个级别上辈子跟事务有仇.
 - PROPAGATION_NESTED
 字面也可知道, nested, 嵌套级别事务, 该传播级别特征是, 如果上下文中存在事务, 则嵌套事务执行, 如果不存在事务, 则新建事务.
-
+嵌套是子事务套在父事务中执行, 子事务是父事务的一部分, 在进入子事务之前, 父事务建立一个回滚点, 叫save point 然后执行子事务, 这个子事务的执行也算是父事务的一部分, 然后子事务执行结束, 父事务继续执行. 重点就在于那个save point.
+### 如果子事务回滚，会发生什么？ 
+父事务会回滚到进入子事务前建立的save point，然后尝试其他的事务或者其他的业务逻辑，父事务之前的操作不会受到影响，更不会自动回滚。
+### 如果父事务回滚，会发生什么？ 
+父事务回滚，子事务也会跟着回滚！为什么呢，因为父事务结束之前，子事务是不会提交的，我们说子事务是父事务的一部分，正是这个道理。那么：
+### 事务的提交，是什么情况？ 
+是父事务先提交，然后子事务提交，还是子事务先提交，父事务再提交？答案是第二种情况，还是那句话，子事务是父事务的一部分，由父事务统一提交。
 ## 10. Spring中用到了哪些设计模式?
+- 简单工厂
+又叫做静态工厂方法（StaticFactory Method）模式，但不属于23种GOF设计模式之一。
+简单工厂模式的实质是由一个工厂类根据传入的参数，动态决定应该创建哪一个产品类。 
+spring中的BeanFactory就是简单工厂模式的体现，根据传入一个唯一的标识来获得bean对象，但是否是在传入参数后创建还是传入参数前创建这个要根据具体情况来定。如下配置，就是在 HelloItxxz 类中创建一个 itxxzBean。
+```xml
+<beans>
+    <bean id="singletonBean" class="com.itxxz.HelloItxxz">
+        <constructor-arg>
+            <value>Hello! 这是singletonBean!value>
+        </constructor-arg>
+    </bean>
+    <bean id="itxxzBean" class="com.itxxz.HelloItxxz"
+        singleton="false">
+        <constructor-arg>
+            <value>Hello! 这是itxxzBean! value>
+        </constructor-arg>
+    </bean>
+</beans>
+```
+- 工厂方法
+通常由应用程序直接使用new创建新的对象，为了将对象的创建和使用相分离，采用工厂模式,即应用程序将对象的创建及初始化职责交给工厂对象。
+一般情况下,应用程序有自己的工厂对象来创建bean.如果将应用程序自己的工厂对象交给Spring管理,那么Spring管理的就不是普通的bean,而是工厂Bean。
+```java
+public class StaticFactoryBean {
+      public static Integer createRandom() {
+           return new Integer(new Random().nextInt());
+       }
+}
+```
+建一个config.xml配置文件，将其纳入Spring容器来管理,需要通过factory-method指定静态方法名称
+```xml
+//createRandom方法必须是static的,才能找到
+<bean id="random" class="example.chapter3.StaticFactoryBean" factory-method="createRandom" scope="prototype"
+/>
+```
+测试:
+```java
+public static void main(String[] args) {
+      //调用getBean()时,返回随机数.如果没有指定factory-method,会返回StaticFactoryBean的实例,即返回工厂Bean的实例
+      XmlBeanFactory factory = new XmlBeanFactory(new ClassPathResource("config.xml"));System.out.println("我是IT学习者创建的实例:"+factory.getBean("random").toString());
+}
+```
+
 ## 11. Spring MVC 的工作原理?
 ## 12. Spring 的循环注入的原理?
 ## 13. Spring AOP 的理解, 各个术语, 他们是怎么相互工作的?
