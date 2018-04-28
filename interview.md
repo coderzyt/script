@@ -1213,7 +1213,31 @@ public static void main(String[] args) {
       XmlBeanFactory factory = new XmlBeanFactory(new ClassPathResource("config.xml"));System.out.println("我是IT学习者创建的实例:"+factory.getBean("random").toString());
 }
 ```
-
+- 单例模式
+保证一个类仅有一个实例，并提供一个访问它的全局访问点。 
+spring中的单例模式完成了后半句话，即提供了全局的访问点BeanFactory。但没有从构造器级别去控制单例，这是因为spring管理的是是任意的java对象。 
+核心提示点：Spring下默认的bean均为singleton，可以通过singleton=“true|false” 或者 scope=“？”来指定
+- 适配器
+在Spring的Aop中，使用的Advice（通知）来增强被代理类的功能。Spring实现这一AOP功能的原理就使用代理模式（1、JDK动态代理。2、CGLib字节码生成技术代理。）对类进行方法级别的切面增强，即，生成被代理类的代理类， 并在代理类的方法前，设置拦截器，通过执行拦截器重的内容增强了代理方法的功能，实现的面向切面编程。
+Adapter类接口：Target
+```java
+public interface AdvisorAdapter {
+    boolean supportsAdvice(Advice advice);
+    MethodInterceptor getInterceptor(Advisor advisor);
+}
+```
+MethodBeforeAdviceAdapter类，Adapter
+```java
+class MethodBeforeAdviceAdapter implements AdvisorAdapter, Serializable {
+      public boolean supportsAdvice(Advice advice) {
+            return (advice instanceof MethodBeforeAdvice);
+      }
+      public MethodInterceptor getInterceptor(Advisor advisor) {
+            MethodBeforeAdvice advice = (MethodBeforeAdvice) advisor.getAdvice();
+            return new MethodBeforeAdviceInterceptor(advice);
+      }
+}
+```
 ## 11. Spring MVC 的工作原理?
 ## 12. Spring 的循环注入的原理?
 ## 13. Spring AOP 的理解, 各个术语, 他们是怎么相互工作的?
@@ -1514,6 +1538,88 @@ Dubbo是一个分布式服务框架，致力于提供高性能和透明化的RPC
 ## 7. 重连机制会不会造成错误
 ## 8. 对分布式事务的理解
 ## 9. 如何实现负载均衡? 有哪些算法可以实现?
+负载均衡，英文名称为Load Balance，指由多台服务器以对称的方式组成一个服务器集合，每台服务器都具有等价的地位，都可以单独对外提供服务而无须其他服务器的辅助。通过某种负载分担技术，将外部发送来的请求均匀分配到对称结构中的某一台服务器上，而接收到请求的服务器独立地回应客户的请求。负载均衡能够平均分配客户请求到服务器阵列，借此提供快速获取重要数据，解决大量并发访问服务问题，这种集群技术可以用最少的投资获得接近于大型主机的性能。
+
+负载均衡分为软件负载均衡和硬件负载均衡，前者的代表是阿里章文嵩博士研发的LVS，后者则是均衡服务器比如F5，当然这只是提一下，不是重点。
+- 轮询法 (Round Robin)
+```java
+public class RoundRobin
+{
+    private static Integer pos = 0;
+    public static String getServer()
+    {
+        // 重建一个Map，避免服务器的上下线导致的并发问题
+        Map<String, Integer> serverMap = 
+                new HashMap<String, Integer>();
+        serverMap.putAll(IpMap.serverWeightMap);
+        // 取得Ip地址List
+        Set<String> keySet = serverMap.keySet();
+        ArrayList<String> keyList = new ArrayList<String>();
+        keyList.addAll(keySet);
+        String server = null;
+        synchronized (pos)
+        {
+            if (pos > keySet.size())
+                pos = 0;
+            server = keyList.get(pos);
+            pos ++;
+        }
+        return server;
+    }
+}
+```
+轮询法的优点在于：试图做到请求转移的绝对均衡。
+轮询法的缺点在于：为了做到请求转移的绝对均衡，必须付出相当大的代价，因为为了保证pos变量修改的互斥性，需要引入重量级的悲观锁synchronized，这将会导致该段轮询代码的并发吞吐量发生明显的下降。
+
+- 随机法
+通过系统随机函数，根据后端服务器列表的大小值来随机选择其中一台进行访问。由概率统计理论可以得知，随着调用量的增大，其实际效果越来越接近于平均分配流量到每一台后端服务器，也就是轮询的效果。
+随机法的代码实现大致如下：
+```java
+public class Random
+{
+    public static String getServer()
+    {
+        // 重建一个Map，避免服务器的上下线导致的并发问题
+        Map<String, Integer> serverMap = new HashMap<String, Integer>();
+        serverMap.putAll(IpMap.serverWeightMap);
+        // 取得Ip地址List
+        Set<String> keySet = serverMap.keySet();
+        ArrayList<String> keyList = new ArrayList<String>();
+        keyList.addAll(keySet);
+        java.util.Random random = new java.util.Random();
+        int randomPos = random.nextInt(keyList.size());
+        return keyList.get(randomPos);
+    }
+}
+```
+整体代码思路和轮询法一致，先重建serverMap，再获取到server列表。在选取server的时候，通过Random的nextInt方法取0~keyList.size()区间的一个随机值，从而从服务器列表中随机获取到一台服务器地址进行返回。基于概率统计的理论，吞吐量越大，随机算法的效果越接近于轮询算法的效果。
+- 源地址哈希法(hash)
+源地址哈希的思想是获取客户端访问的IP地址值，通过哈希函数计算得到一个数值，用该数值对服务器列表的大小进行取模运算，得到的结果便是要访问的服务器的序号。源地址哈希算法的代码实现大致如下：
+```java
+public class Hash
+{
+    public static String getServer() {
+        // 重建一个Map，避免服务器的上下线导致的并发问题
+        Map<String, Integer> serverMap = 
+                new HashMap<String, Integer>();
+        serverMap.putAll(IpMap.serverWeightMap);
+        // 取得Ip地址List
+        Set<String> keySet = serverMap.keySet();
+        ArrayList<String> keyList = new ArrayList<String>();
+        keyList.addAll(keySet);
+        // 在Web应用中可通过HttpServlet的getRemoteIp方法获取
+        String remoteIp = "127.0.0.1";
+        int hashCode = remoteIp.hashCode();
+        int serverListSize = keyList.size();
+        int serverPos = hashCode % serverListSize;
+        return keyList.get(serverPos);
+    }
+}
+```
+源地址哈希法的优点在于：保证了相同客户端IP地址将会被哈希到同一台后端服务器，直到后端服务器列表变更。根据此特性可以在服务消费者与服务提供者之间建立有状态的session会话。
+源地址哈希算法的缺点在于：除非集群中服务器的非常稳定，基本不会上下线，否则一旦有服务器上线、下线，那么通过源地址哈希算法路由到的服务器是服务器上线、下线前路由到的服务器的概率非常低，如果是session则取不到session，如果是缓存则可能引发"雪崩"。
+
+- 加权轮询法(Weight Round Robin)
 ## 10. Zookeeper的用途, 选举的原理是什么?
 ## 11. 数据的垂直拆分和水平拆分
 ## 12. Zookeeper的原理和适用场景
